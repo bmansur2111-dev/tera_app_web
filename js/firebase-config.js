@@ -13,12 +13,13 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "ВСТАВЬ_СЮДА",
-  authDomain: "ВСТАВЬ_СЮДА.firebaseapp.com",
-  projectId: "ВСТАВЬ_СЮДА",
-  storageBucket: "ВСТАВЬ_СЮДА.appspot.com",
-  messagingSenderId: "ВСТАВЬ_СЮДА",
-  appId: "ВСТАВЬ_СЮДА"
+  apiKey: "AIzaSyBqEJD4eyR9_z_h2X_XkpGUYc8wOV6h5Og",
+  authDomain: "tera-eco-app.firebaseapp.com",
+  projectId: "tera-eco-app",
+  storageBucket: "tera-eco-app.firebasestorage.app",
+  messagingSenderId: "128530104831",
+  appId: "1:128530104831:web:058edd0853cb7c701827ca",
+  measurementId: "G-KMS58TKF87"
 };
 
 export const app = initializeApp(firebaseConfig);

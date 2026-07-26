@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кабинет партнёра — Tera</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <a href="../index.html" class="logo">Ter<span>a</span></a>
+    <nav class="app-nav">
+      <a href="dashboard-partner.html" class="active">🎯 Мои квесты</a>
+      <a href="#" onclick="alert('Страница в разработке'); return false;">☕ Купоны</a>
+      <a href="#" onclick="alert('Страница в разработке'); return false;">💬 Чаты</a>
+      <a href="#" onclick="alert('Страница в разработке'); return false;">👤 Профиль</a>
+      <a href="#" id="logoutBtn">🚪 Выйти</a>
+    </nav>
+  </aside>
+
+  <main class="app-main">
+    <div class="app-topbar">
+      <div>
+        <h2 id="greeting">Привет!</h2>
+        <p style="margin:0;">Публикуйте задания для волонтёров.</p>
+      </div>
+      <button class="btn btn-accent" onclick="document.getElementById('newQuestForm').classList.toggle('open-form')">+ Новый квест</button>
+    </div>
+
+    <form id="newQuestForm" class="auth-card" style="max-width:none; margin-bottom: 32px; display:none;">
+      <div class="form-group">
+        <label for="qTitle">Название задания</label>
+        <input type="text" id="qTitle" required placeholder="Например: Уборка берега реки">
+      </div>
+      <div class="form-group">
+        <label for="qCategory">Категория</label>
+        <input type="text" id="qCategory" required placeholder="Например: Экология">
+      </div>
+      <div class="form-group">
+        <label for="qReward">Награда (купон)</label>
+        <input type="text" id="qReward" required placeholder="Например: Skuratov Coffee, 1 напиток">
+      </div>
+      <button type="submit" class="btn btn-primary">Опубликовать квест</button>
+      <p class="form-msg" id="formMsg"></p>
+    </form>
+
+    <h3>Ваши опубликованные квесты</h3>
+    <div class="quest-list" id="questList">
+      <div class="empty-state">Загружаем ваши квесты…</div>
+    </div>
+  </main>
+</div>
+
+<style>
+  #newQuestForm.open-form { display: block; }
+</style>
+
+<script type="module">
+  import { requireAuth, logout, createQuest, loadQuests } from "../js/app.js";
+
+  let currentProfile = null;
+
+  requireAuth("partner", async (profile) => {
+    currentProfile = profile;
+    document.getElementById("greeting").textContent = `Привет, ${profile.name}!`;
+    await renderMyQuests();
+  });
+
+  async function renderMyQuests() {
+    const list = document.getElementById("questList");
+    try {
+      const quests = await loadQuests();
+      const mine = quests.filter(q => q.ownerUid === currentProfile.uid);
+
+      if (mine.length === 0) {
+        list.innerHTML = `<div class="empty-state">Вы ещё не опубликовали ни одного квеста. Нажмите «+ Новый квест», чтобы начать.</div>`;
+        return;
+      }
+
+      list.innerHTML = mine.map(q => `
+        <div class="ticket">
+          <div class="ticket-icon">🎯</div>
+          <div>
+            <div class="ticket-tag">${(q.category || "").toUpperCase()} · ${q.status === "closed" ? "закрыт" : "открыт"}</div>
+            <div class="ticket-title">${q.title}</div>
+            <div class="ticket-reward">+ купон · ${q.reward}</div>
+          </div>
+        </div>
+      `).join("");
+    } catch (e) {
+      list.innerHTML = `<div class="empty-state">Не удалось загрузить квесты. Проверьте настройки Firebase.</div>`;
+      console.error(e);
+    }
+  }
+
+  document.getElementById("newQuestForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById("formMsg");
+    const title = document.getElementById("qTitle").value.trim();
+    const category = document.getElementById("qCategory").value.trim();
+    const reward = document.getElementById("qReward").value.trim();
+
+    try {
+      await createQuest({ title, category, reward, ownerUid: currentProfile.uid, ownerName: currentProfile.name });
+      msg.textContent = "Квест опубликован!";
+      msg.className = "form-msg success";
+      e.target.reset();
+      await renderMyQuests();
+    } catch (err) {
+      msg.textContent = "Не удалось опубликовать. Попробуйте снова.";
+      msg.className = "form-msg error";
+      console.error(err);
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
+</script>
+
+</body>
+</html>

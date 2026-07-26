@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Регистрация — Tera</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <a href="../index.html" class="logo" style="justify-content:center; margin-bottom: 24px;">Ter<span>a</span></a>
+    <h2 style="text-align:center;">Создать аккаунт</h2>
+
+    <div class="role-toggle" id="roleToggle">
+      <button type="button" data-role="volunteer" class="active">Я волонтёр</button>
+      <button type="button" data-role="partner">Я партнёр</button>
+    </div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="name">Имя</label>
+        <input type="text" id="name" required placeholder="Ваше имя">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" required minlength="6" placeholder="Минимум 6 символов">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+      <p class="form-msg" id="formMsg"></p>
+    </form>
+
+    <p class="auth-footer-link">Уже есть аккаунт? <a href="login.html">Войти</a></p>
+  </div>
+</div>
+
+<script type="module">
+  import { initRoleToggle, registerUser, redirectByRole, friendlyError } from "../js/auth.js";
+
+  let selectedRole = new URLSearchParams(window.location.search).get("role") === "partner" ? "partner" : "volunteer";
+
+  // подсветить нужную кнопку, если роль пришла из ссылки (?role=partner)
+  const toggle = document.getElementById("roleToggle");
+  toggle.querySelectorAll("button").forEach(b => {
+    b.classList.toggle("active", b.dataset.role === selectedRole);
+  });
+
+  initRoleToggle("roleToggle", (role) => { selectedRole = role; });
+
+  const form = document.getElementById("registerForm");
+  const msg = document.getElementById("formMsg");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.textContent = "";
+    msg.className = "form-msg";
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+      const { role } = await registerUser({ name, email, password, role: selectedRole });
+      msg.textContent = "Готово! Перенаправляем…";
+      msg.className = "form-msg success";
+      setTimeout(() => redirectByRole(role), 600);
+    } catch (err) {
+      msg.textContent = friendlyError(err.code);
+      msg.className = "form-msg error";
+    }
+  });
+</script>
+
+</body>
+</html>

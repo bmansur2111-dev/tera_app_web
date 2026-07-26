@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Контакты — Tera</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Ter<span>a</span></a>
+    <div class="nav-links">
+      <a href="index.html#how">Как это работает</a>
+      <a href="partners.html">Партнёрам</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+    <div class="nav-cta">
+      <a href="auth/login.html" class="btn btn-ghost">Войти</a>
+      <a href="auth/register.html" class="btn btn-primary">Начать</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:0;">
+  <div class="container" style="max-width:640px;">
+    <span class="eyebrow">Связаться с нами</span>
+    <h1>Есть вопрос или предложение?</h1>
+    <p class="lead">Напишите нам — отвечаем лично, без ботов и шаблонов.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container" style="max-width: 520px;">
+    <form class="auth-card" style="max-width:none;" onsubmit="event.preventDefault(); alert('Спасибо! Мы свяжемся с вами в ближайшее время.');">
+      <div class="form-group">
+        <label for="name">Имя</label>
+        <input type="text" id="name" required placeholder="Как к вам обращаться">
+      </div>
+      <div class="form-group">
+        <label for="email">Email или телефон</label>
+        <input type="text" id="email" required placeholder="Для связи">
+      </div>
+      <div class="form-group">
+        <label for="msg">Сообщение</label>
+        <textarea id="msg" rows="4" required placeholder="Расскажите, чем можем помочь"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Отправить</button>
+    </form>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <a href="index.html" class="logo">Ter<span>a</span></a>
+    <div class="footer-links">
+      <a href="partners.html">Партнёрам</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+    <p style="margin:0; font-size:0.85rem;">© 2026 Tera</p>
+  </div>
+</footer>
+
+</body>
+</html>

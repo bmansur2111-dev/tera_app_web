@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мои квесты — Tera</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <a href="../index.html" class="logo">Ter<span>a</span></a>
+    <nav class="app-nav">
+      <a href="dashboard-volunteer.html" class="active">🎯 Квесты</a>
+      <a href="#" onclick="alert('Страница в разработке'); return false;">🛍 Магазин</a>
+      <a href="#" onclick="alert('Страница в разработке'); return false;">💬 Чаты</a>
+      <a href="#" onclick="alert('Страница в разработке'); return false;">👤 Профиль</a>
+      <a href="#" id="logoutBtn">🚪 Выйти</a>
+    </nav>
+  </aside>
+
+  <main class="app-main">
+    <div class="app-topbar">
+      <div>
+        <h2 id="greeting">Привет!</h2>
+        <p style="margin:0;">Вот открытые квесты от организаций.</p>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statOpen">—</div>
+        <div class="stat-label">Открытых квестов</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Выполнено</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Купонов получено</div>
+      </div>
+    </div>
+
+    <h3>Доступные квесты</h3>
+    <div class="quest-list" id="questList">
+      <div class="empty-state">Загружаем квесты…</div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { requireAuth, logout, loadQuests } from "../js/app.js";
+
+  requireAuth("volunteer", async (profile) => {
+    document.getElementById("greeting").textContent = `Привет, ${profile.name}!`;
+
+    const list = document.getElementById("questList");
+    try {
+      const quests = await loadQuests();
+      const openQuests = quests.filter(q => q.status !== "closed");
+      document.getElementById("statOpen").textContent = openQuests.length;
+
+      if (openQuests.length === 0) {
+        list.innerHTML = `<div class="empty-state">Пока нет открытых квестов. Загляните позже — партнёры уже готовят задания 🌱</div>`;
+        return;
+      }
+
+      list.innerHTML = openQuests.map(q => `
+        <div class="ticket">
+          <div class="ticket-icon">🎯</div>
+          <div>
+            <div class="ticket-tag">${(q.category || "ЗАДАНИЕ").toUpperCase()} · от ${q.ownerName || "организации"}</div>
+            <div class="ticket-title">${q.title}</div>
+            <div class="ticket-reward">+ купон · ${q.reward || "уточняется"}</div>
+          </div>
+        </div>
+      `).join("");
+    } catch (e) {
+      list.innerHTML = `<div class="empty-state">Не удалось загрузить квесты. Проверьте настройки Firebase.</div>`;
+      console.error(e);
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
+</script>
+
+</body>
+</html>

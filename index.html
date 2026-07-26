@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tera — квесты, которые меняют город</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">Ter<span>a</span></a>
+    <div class="nav-links">
+      <a href="index.html#how">Как это работает</a>
+      <a href="partners.html">Партнёрам</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+    <div class="nav-cta">
+      <a href="auth/login.html" class="btn btn-ghost">Войти</a>
+      <a href="auth/register.html" class="btn btn-primary">Начать</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">Волонтёрство · Квесты · Награды</span>
+      <h1>Помогай городу.<br>Получай купоны.</h1>
+      <p class="lead">Tera превращает волонтёрские задания от организаций в квесты. Выполнил — получил купон от кофейни или партнёра. Просто, честно, с пользой.</p>
+      <div class="hero-actions">
+        <a href="auth/register.html" class="btn btn-accent">Стать волонтёром</a>
+        <a href="partners.html" class="btn btn-ghost">Я организация / партнёр</a>
+      </div>
+    </div>
+    <div class="hero-stack">
+      <div class="ticket">
+        <div class="ticket-icon">🌱</div>
+        <div>
+          <div class="ticket-tag">КВЕСТ #014 · ЭКОЛОГИЯ</div>
+          <div class="ticket-title">Убрать берег реки в парке</div>
+          <div class="ticket-reward">+ купон · Skuratov Coffee, 1 напиток</div>
+        </div>
+      </div>
+      <div class="ticket">
+        <div class="ticket-icon">📚</div>
+        <div>
+          <div class="ticket-tag">КВЕСТ #027 · ОБРАЗОВАНИЕ</div>
+          <div class="ticket-title">Провести урок в детском доме</div>
+          <div class="ticket-reward">+ купон · CoffeeBoom, скидка 20%</div>
+        </div>
+      </div>
+      <div class="ticket">
+        <div class="ticket-icon">🐾</div>
+        <div>
+          <div class="ticket-tag">КВЕСТ #031 · ЖИВОТНЫЕ</div>
+          <div class="ticket-title">Выгул собак в приюте</div>
+          <div class="ticket-reward">+ купон · Traveler's Coffee, десерт</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="how">
+  <div class="container">
+    <span class="eyebrow">Как это работает</span>
+    <h2>Три шага от идеи до чашки кофе</h2>
+    <div class="grid-3" style="margin-top: 32px;">
+      <div class="feature-card">
+        <div class="feature-icon">①</div>
+        <h3>Выбери квест</h3>
+        <p>Организации публикуют задания — от уборки территории до помощи на мероприятиях. Выбирай то, что откликается.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">②</div>
+        <h3>Выполни и подтверди</h3>
+        <p>Сделал дело — отправь подтверждение. Организация проверяет и засчитывает выполнение.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">③</div>
+        <h3>Получи купон</h3>
+        <p>Награда приходит в твой профиль — купон от кофейни или другого партнёра проекта.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <span class="eyebrow">Для кого Tera</span>
+    <h2>Два входа — один город</h2>
+    <div class="role-split" style="margin-top: 32px;">
+      <div class="role-card volunteer">
+        <span class="eyebrow" style="color:var(--accent-soft)">Волонтёрам</span>
+        <h3>Делай добро, получай приятные бонусы</h3>
+        <ul>
+          <li>Лента квестов от проверенных организаций</li>
+          <li>Личный прогресс и история выполненных заданий</li>
+          <li>Магазин купонов от локальных партнёров</li>
+        </ul>
+        <a href="auth/register.html?role=volunteer" class="btn btn-accent">Зарегистрироваться</a>
+      </div>
+      <div class="role-card partner">
+        <span class="eyebrow">Организациям и партнёрам</span>
+        <h3>Находи волонтёров и продвигай бренд</h3>
+        <ul>
+          <li>Публикуй задания и находи мотивированных волонтёров</li>
+          <li>Настраивай купоны — свою «валюту» вовлечения</li>
+          <li>Прозрачная статистика по выполненным квестам</li>
+        </ul>
+        <a href="partners.html" class="btn btn-primary">Узнать больше</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="text-align:center; max-width: 640px;">
+    <h2>Проект на старте — присоединяйся одним из первых</h2>
+    <p>Tera сейчас в стадии MVP: мы собираем первых волонтёров и партнёров, чтобы вместе отточить формат.</p>
+    <a href="auth/register.html" class="btn btn-primary">Присоединиться</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <a href="index.html" class="logo">Ter<span>a</span></a>
+    <div class="footer-links">
+      <a href="partners.html">Партнёрам</a>
+      <a href="contacts.html">Контакты</a>
+    </div>
+    <p style="margin:0; font-size:0.85rem;">© 2026 Tera</p>
+  </div>
+</footer>
+
+</body>
+</html>

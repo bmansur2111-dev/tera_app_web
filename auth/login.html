@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход — Tera</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <a href="../index.html" class="logo" style="justify-content:center; margin-bottom: 24px;">Ter<span>a</span></a>
+    <h2 style="text-align:center;">С возвращением</h2>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" required placeholder="Ваш пароль">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Войти</button>
+      <p class="form-msg" id="formMsg"></p>
+    </form>
+
+    <p class="auth-footer-link">Ещё нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
+  </div>
+</div>
+
+<script type="module">
+  import { loginUser, redirectByRole, friendlyError } from "../js/auth.js";
+
+  const form = document.getElementById("loginForm");
+  const msg = document.getElementById("formMsg");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.textContent = "";
+    msg.className = "form-msg";
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+      const { profile } = await loginUser({ email, password });
+      msg.textContent = "Готово! Перенаправляем…";
+      msg.className = "form-msg success";
+      setTimeout(() => redirectByRole(profile?.role), 600);
+    } catch (err) {
+      msg.textContent = friendlyError(err.code);
+      msg.className = "form-msg error";
+    }
+  });
+</script>
+
+</body>
+</html>

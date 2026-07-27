@@ -22,16 +22,18 @@ export function initRoleToggle(containerId, onChange) {
 }
 
 // ---------- Регистрация ----------
-export async function registerUser({ name, email, password, role }) {
+// Публичная регистрация доступна только волонтёрам.
+// Аккаунты партнёров создаются вручную (см. README) с нужным набором прав.
+export async function registerUser({ name, email, password }) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
   await setDoc(doc(db, "users", cred.user.uid), {
     name,
     email,
-    role, // "volunteer" | "partner"
+    role: "volunteer",
     createdAt: new Date().toISOString(),
     points: 0
   });
-  return { uid: cred.user.uid, role };
+  return { uid: cred.user.uid, role: "volunteer" };
 }
 
 // ---------- Вход ----------

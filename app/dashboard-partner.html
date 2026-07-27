@@ -11,10 +11,7 @@
 <div class="app-shell">
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
-    <nav class="app-nav">
-      <a href="dashboard-partner.html" class="active">🎯 Мои квесты</a>
-      <a href="#" onclick="alert('Страница в разработке'); return false;">☕ Купоны</a>
-      <a href="#" onclick="alert('Страница в разработке'); return false;">💬 Чаты</a>
+    <nav class="app-nav" id="appNav">
       <a href="#" onclick="alert('Страница в разработке'); return false;">👤 Профиль</a>
       <a href="#" id="logoutBtn">🚪 Выйти</a>
     </nav>
@@ -24,32 +21,46 @@
     <div class="app-topbar">
       <div>
         <h2 id="greeting">Привет!</h2>
-        <p style="margin:0;">Публикуйте задания для волонтёров.</p>
+        <p style="margin:0;" id="subGreeting">Загружаем ваш кабинет…</p>
       </div>
-      <button class="btn btn-accent" onclick="document.getElementById('newQuestForm').classList.toggle('open-form')">+ Новый квест</button>
     </div>
 
-    <form id="newQuestForm" class="auth-card" style="max-width:none; margin-bottom: 32px; display:none;">
-      <div class="form-group">
-        <label for="qTitle">Название задания</label>
-        <input type="text" id="qTitle" required placeholder="Например: Уборка берега реки">
+    <section id="questsSection" style="display:none;">
+      <div class="app-topbar">
+        <h3 style="margin:0;">Ваши опубликованные квесты</h3>
+        <button class="btn btn-accent" onclick="document.getElementById('newQuestForm').classList.toggle('open-form')">+ Новый квест</button>
       </div>
-      <div class="form-group">
-        <label for="qCategory">Категория</label>
-        <input type="text" id="qCategory" required placeholder="Например: Экология">
-      </div>
-      <div class="form-group">
-        <label for="qReward">Награда (купон)</label>
-        <input type="text" id="qReward" required placeholder="Например: Skuratov Coffee, 1 напиток">
-      </div>
-      <button type="submit" class="btn btn-primary">Опубликовать квест</button>
-      <p class="form-msg" id="formMsg"></p>
-    </form>
 
-    <h3>Ваши опубликованные квесты</h3>
-    <div class="quest-list" id="questList">
-      <div class="empty-state">Загружаем ваши квесты…</div>
-    </div>
+      <form id="newQuestForm" class="auth-card" style="max-width:none; margin-bottom: 32px; display:none;">
+        <div class="form-group">
+          <label for="qTitle">Название задания</label>
+          <input type="text" id="qTitle" required placeholder="Например: Уборка берега реки">
+        </div>
+        <div class="form-group">
+          <label for="qCategory">Категория</label>
+          <input type="text" id="qCategory" required placeholder="Например: Экология">
+        </div>
+        <div class="form-group">
+          <label for="qReward">Награда (купон)</label>
+          <input type="text" id="qReward" required placeholder="Например: Skuratov Coffee, 1 напиток">
+        </div>
+        <button type="submit" class="btn btn-primary">Опубликовать квест</button>
+        <p class="form-msg" id="formMsg"></p>
+      </form>
+
+      <div class="quest-list" id="questList">
+        <div class="empty-state">Загружаем ваши квесты…</div>
+      </div>
+    </section>
+
+    <section id="couponsSection" style="display:none; margin-top: 32px;">
+      <h3>Ваши купоны</h3>
+      <div class="empty-state">Раздел «Купоны» в разработке — появится, как только будет готов дизайн страницы «Магазин».</div>
+    </section>
+
+    <section id="noAccessSection" style="display:none;">
+      <div class="empty-state">У вашего аккаунта пока не настроены права. Обратитесь к администратору Tera.</div>
+    </section>
   </main>
 </div>
 
@@ -65,7 +76,45 @@
   requireAuth("partner", async (profile) => {
     currentProfile = profile;
     document.getElementById("greeting").textContent = `Привет, ${profile.name}!`;
-    await renderMyQuests();
+
+    const perms = profile.permissions || {};
+    const canQuests = !!perms.quests;
+    const canCoupons = !!perms.coupons;
+
+    const parts = [];
+    if (canQuests) parts.push("публикация квестов");
+    if (canCoupons) parts.push("управление купонами");
+    document.getElementById("subGreeting").textContent = parts.length
+      ? `Доступно: ${parts.join(" · ")}`
+      : "Права пока не настроены.";
+
+    const nav = document.getElementById("appNav");
+    if (canQuests) {
+      const link = document.createElement("a");
+      link.href = "#quests";
+      link.className = "active";
+      link.textContent = "🎯 Мои квесты";
+      link.onclick = (e) => { e.preventDefault(); document.getElementById("questsSection").scrollIntoView({behavior:"smooth"}); };
+      nav.prepend(link);
+    }
+    if (canCoupons) {
+      const link = document.createElement("a");
+      link.href = "#coupons";
+      link.textContent = "☕ Купоны";
+      link.onclick = (e) => { e.preventDefault(); document.getElementById("couponsSection").scrollIntoView({behavior:"smooth"}); };
+      nav.insertBefore(link, nav.querySelector('[onclick*="Профиль"]'));
+    }
+
+    if (canQuests) {
+      document.getElementById("questsSection").style.display = "block";
+      await renderMyQuests();
+    }
+    if (canCoupons) {
+      document.getElementById("couponsSection").style.display = "block";
+    }
+    if (!canQuests && !canCoupons) {
+      document.getElementById("noAccessSection").style.display = "block";
+    }
   });
 
   async function renderMyQuests() {

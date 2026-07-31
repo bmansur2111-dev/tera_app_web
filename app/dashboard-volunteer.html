@@ -3,59 +3,264 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мои квесты — Tera</title>
+<title>Личный кабинет — Tera</title>
 <link rel="stylesheet" href="../css/style.css">
+<style>
+  /* Вкладки */
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+  .app-nav a {
+    cursor: pointer;
+  }
+
+  /* Стили для Профиля */
+  .profile-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.08);
+    margin-top: 16px;
+  }
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #1b4332;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .profile-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+  }
+  .profile-info p {
+    margin: 0 0 8px 0;
+    color: #666;
+  }
+  .profile-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .shop-grid, .chat-list {
+    display: grid;
+    gap: 16px;
+    margin-top: 16px;
+  }
+</style>
 </head>
 <body>
 
 <div class="app-shell">
+  <!-- Боковое меню -->
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
     <nav class="app-nav">
-      <a href="dashboard-volunteer.html" class="active">🎯 Квесты</a>
-      <a href="#" onclick="alert('Страница в разработке'); return false;">🛍 Магазин</a>
-      <a href="#" onclick="alert('Страница в разработке'); return false;">💬 Чаты</a>
-      <a href="#" onclick="alert('Страница в разработке'); return false;">👤 Профиль</a>
+      <a class="nav-link active" data-tab="quests">🎯 Квесты</a>
+      <a class="nav-link" data-tab="shop">🛍 Магазин</a>
+      <a class="nav-link" data-tab="chats">💬 Чаты</a>
+      <a class="nav-link" data-tab="profile">👤 Профиль</a>
       <a href="#" id="logoutBtn">🚪 Выйти</a>
     </nav>
   </aside>
 
+  <!-- Основной контент -->
   <main class="app-main">
-    <div class="app-topbar">
-      <div>
-        <h2 id="greeting">Привет!</h2>
-        <p style="margin:0;">Вот открытые квесты от организаций.</p>
-      </div>
-    </div>
 
-    <div class="stat-row">
-      <div class="stat-card">
-        <div class="stat-num" id="statOpen">—</div>
-        <div class="stat-label">Открытых квестов</div>
+    <!-- ВКЛАДКА 1: КВЕСТЫ -->
+    <section id="tab-quests" class="tab-content active">
+      <div class="app-topbar">
+        <div>
+          <h2 class="user-greeting">Привет!</h2>
+          <p style="margin:0;">Вот открытые квесты от организаций.</p>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num">0</div>
-        <div class="stat-label">Выполнено</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num">0</div>
-        <div class="stat-label">Купонов получено</div>
-      </div>
-    </div>
 
-    <h3>Доступные квесты</h3>
-    <div class="quest-list" id="questList">
-      <div class="empty-state">Загружаем квесты…</div>
-    </div>
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-num" id="statOpen">—</div>
+          <div class="stat-label">Открытых квестов</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Выполнено</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Купонов получено</div>
+        </div>
+      </div>
+
+      <h3>Доступные квесты</h3>
+      <div class="quest-list" id="questList">
+        <div class="empty-state">Загружаем квесты…</div>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА 2: МАГАЗИН -->
+    <section id="tab-shop" class="tab-content">
+      <div class="app-topbar">
+        <div>
+          <h2>Магазин наград</h2>
+          <p style="margin:0;">Обменивай накопленные баллы на бонусы от партнеров.</p>
+        </div>
+      </div>
+
+      <div class="shop-grid">
+        <div class="ticket">
+          <div class="ticket-icon">☕</div>
+          <div>
+            <div class="ticket-tag">ЕДА И НАПИТКИ · Skurator Coffee</div>
+            <div class="ticket-title">Бесплатный кофе на выбор</div>
+            <div class="ticket-reward">Стоимость: 150 XP</div>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="ticket-icon">🍕</div>
+          <div>
+            <div class="ticket-tag">ЕДА И НАПИТКИ · CoffeeBoom</div>
+            <div class="ticket-title">Скидка 20% на десерты</div>
+            <div class="ticket-reward">Стоимость: 200 XP</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА 3: ЧАТЫ -->
+    <section id="tab-chats" class="tab-content">
+      <div class="app-topbar">
+        <div>
+          <h2>Сообщество и Чаты</h2>
+          <p style="margin:0;">Общайся с волонтерами и задавай вопросы Эко-Помощнику.</p>
+        </div>
+      </div>
+
+      <div class="chat-list">
+        <div class="ticket">
+          <div class="ticket-icon">🤖</div>
+          <div>
+            <div class="ticket-tag">ИИ-ПОМОЩНИК</div>
+            <div class="ticket-title">Эко-Помощник Tera AI</div>
+            <div class="ticket-reward">Задай вопрос об экологии и акциях</div>
+          </div>
+        </div>
+        <div class="ticket">
+          <div class="ticket-icon">💬</div>
+          <div>
+            <div class="ticket-tag">ОБЩИЙ ЧАТ</div>
+            <div class="ticket-title">#сообщество-волонтеров</div>
+            <div class="ticket-reward">Обсуждение совместных выездов</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ВКЛАДКА 4: ПРОФИЛЬ -->
+    <section id="tab-profile" class="tab-content">
+      <div class="app-topbar">
+        <div>
+          <h2>Мой профиль</h2>
+          <p style="margin:0;">Управление аккаунтом и личные достижения.</p>
+        </div>
+      </div>
+
+      <!-- Карточка профиля -->
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar">U</div>
+        <div class="profile-info">
+          <h3 id="profileName">Загрузка...</h3>
+          <p id="profileEmail">email@example.com</p>
+          <span class="profile-badge" id="profileRole">🌱 Эко-Волонтёр</span>
+        </div>
+      </div>
+
+      <!-- Статистика волонтера -->
+      <h3 style="margin-top: 24px;">Статистика и достижения</h3>
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-num">0 XP</div>
+          <div class="stat-label">Накоплено опыта</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Выполнено квестов</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Спасенных деревьев</div>
+        </div>
+      </div>
+
+      <!-- Награды -->
+      <h3 style="margin-top: 24px;">Мои награды</h3>
+      <div class="ticket">
+        <div class="ticket-icon">🏆</div>
+        <div>
+          <div class="ticket-tag">ДОСТИЖЕНИЕ</div>
+          <div class="ticket-title">Первый шаг</div>
+          <div class="ticket-reward">Зарегистрировался в системе Tera</div>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
 <script type="module">
   import { requireAuth, logout, loadQuests } from "../js/app.js";
 
-  requireAuth("volunteer", async (profile) => {
-    document.getElementById("greeting").textContent = `Привет, ${profile.name}!`;
+  // Переключение вкладок
+  const navLinks = document.querySelectorAll('.app-nav .nav-link');
+  const tabContents = document.querySelectorAll('.tab-content');
 
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetTab = link.getAttribute('data-tab');
+
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+        if (content.id === `tab-${targetTab}`) {
+          content.classList.add('active');
+        }
+      });
+    });
+  });
+
+  // Авторизация и вывод данных в профиль
+  requireAuth("volunteer", async (profile) => {
+    const userName = profile.name || "Волонтёр";
+    const userEmail = profile.email || "Пользователь";
+
+    // Обновляем приветствие и карточку профиля
+    document.querySelectorAll(".user-greeting").forEach(el => {
+      el.textContent = `Привет, ${userName}!`;
+    });
+    
+    document.getElementById("profileName").textContent = userName;
+    document.getElementById("profileEmail").textContent = userEmail;
+    document.getElementById("profileAvatar").textContent = userName.charAt(0);
+
+    // Загружаем квесты
     const list = document.getElementById("questList");
     try {
       const quests = await loadQuests();
@@ -83,6 +288,7 @@
     }
   });
 
+  // Выход
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
     logout();

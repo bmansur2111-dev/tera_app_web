@@ -15,12 +15,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = window.firebaseConfig || {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "tera-eco-app.firebaseapp.com",
-  projectId: "tera-eco-app",
-  storageBucket: "tera-eco-app.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBqEJD4eyR9_z_h2X_XkpGUYc8wOV6h5Og",
+  authDomain: "tera-eco-app.firebaseapp.com",
+  projectId: "tera-eco-app",
+  storageBucket: "tera-eco-app.firebasestorage.app",
+  messagingSenderId: "128530104831",
+  appId: "1:128530104831:web:058edd0853cb7c701827ca",
+  measurementId: "G-KMS58TKF87"
 };
 
 const app = initializeApp(firebaseConfig);

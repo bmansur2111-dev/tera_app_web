@@ -1,22 +1,33 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, getDocs, query, where, arrayUnion, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  updateDoc, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  where, 
+  arrayUnion, 
+  deleteDoc 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = window.firebaseConfig || {
-  apiKey: "AIzaSyBqEJD4eyR9_z_h2X_XkpGUYc8wOV6h5Og",
-  authDomain: "tera-eco-app.firebaseapp.com",
-  projectId: "tera-eco-app",
-  storageBucket: "tera-eco-app.firebasestorage.app",
-  messagingSenderId: "128530104831",
-  appId: "1:128530104831:web:058edd0853cb7c701827ca",
-  measurementId: "G-KMS58TKF87"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "tera-eco-app.firebaseapp.com",
+  projectId: "tera-eco-app",
+  storageBucket: "tera-eco-app.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Проверка авторизации и роли
+// Проверка авторизации и роли пользователя
 export function requireAuth(expectedRole, callback) {
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -27,7 +38,7 @@ export function requireAuth(expectedRole, callback) {
     try {
       const userDoc = await getDoc(doc(db, "users", user.uid));
       if (!userDoc.exists()) {
-        alert("Профиль не найден в базе!");
+        alert("Профиль не найден в базе данных!");
         window.location.href = "../auth/login.html";
         return;
       }
@@ -62,6 +73,10 @@ export async function createQuest(questData) {
 
   return await addDoc(collection(db, "quests"), {
     ...questData,
+    maxVolunteers: (questData.maxVolunteers !== null && questData.maxVolunteers !== undefined && questData.maxVolunteers !== "") 
+      ? Number(questData.maxVolunteers) 
+      : null,
+    registeredCount: 0,
     ownerId: user.uid,
     createdAt: new Date().toISOString(),
     status: "open"
@@ -91,6 +106,10 @@ export async function createCoupon(couponData) {
   return await addDoc(collection(db, "coupons"), {
     ...couponData,
     cost: Number(couponData.cost),
+    maxQuantity: (couponData.maxQuantity !== null && couponData.maxQuantity !== undefined && couponData.maxQuantity !== "") 
+      ? Number(couponData.maxQuantity) 
+      : null,
+    claimedCount: 0,
     ownerId: user.uid,
     createdAt: new Date().toISOString()
   });
@@ -113,35 +132,51 @@ export async function deleteCoupon(couponId) {
 
 // Покупка купона волонтёром
 export async function buyCoupon(userProfile, coupon) {
-  const currentXP = userProfile.xp !== undefined ? userProfile.xp : 500;
+  const currentXP = userProfile.xp !== undefined && userProfile.xp !== null ? Number(userProfile.xp) : 0;
 
+  // 1. Проверяем баланс XP
   if (currentXP < coupon.cost) {
-    alert(`Недостаточно XP! У вас: ${currentXP} XP, а стоимость купона: ${coupon.cost} XP.`);
+    alert(`Недостаточно XP! У вас: ${currentXP} XP, а стоимость: ${coupon.cost} XP.`);
+    return false;
+  }
+
+  // 2. Проверяем наличие купонов
+  const claimed = coupon.claimedCount || 0;
+  if (coupon.maxQuantity !== null && coupon.maxQuantity !== undefined && claimed >= coupon.maxQuantity) {
+    alert("К сожалению, эти купоны закончились!");
     return false;
   }
 
   const newXP = currentXP - coupon.cost;
   const userRef = doc(db, "users", userProfile.uid);
+  const couponRef = doc(db, "coupons", coupon.id);
 
   const purchasedItem = {
     couponId: coupon.id,
     title: coupon.title,
     code: coupon.code || "ПРОМОКОД: TERA-SPECIAL",
-    boughtAt: new Date().toLocaleString()
+    cost: coupon.cost,
+    boughtAt: new Date().toLocaleString("ru-RU")
   };
 
+  // Обновляем XP и список купленных купонов
   await updateDoc(userRef, {
     xp: newXP,
     purchasedCoupons: arrayUnion(purchasedItem)
   });
 
-  alert(`🎉 Успешно! Вы приобрели купон "${coupon.title}". Промокод доступен в вашем профиле!`);
+  // Увеличиваем счетчик забранных купонов
+  await updateDoc(couponRef, {
+    claimedCount: claimed + 1
+  });
+
+  alert(`🎉 Успешно! Вы приобрели купон "${coupon.title}". Промокод сохранен во вкладке "Профиль"!`);
   return true;
 }
 
-// Редактирование профиля
+// Редактирование профиля (имя, аватар)
 export async function updateUserProfile(uid, data) {
   const userRef = doc(db, "users", uid);
   await updateDoc(userRef, data);
-  alert("Профиль успешно обновлен!");
+  alert("Профиль успешно обновлён!");
 }

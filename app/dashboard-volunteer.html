@@ -6,58 +6,42 @@
 <title>Кабинет Волонтёра — Tera</title>
 <link rel="stylesheet" href="../css/style.css">
 <style>
+  body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; color: #333; }
+  .app-shell { display: flex; min-height: 100vh; }
+  .app-sidebar { width: 250px; background: #0f281e; color: white; padding: 20px; flex-shrink: 0; }
+  .app-sidebar .logo { font-size: 28px; font-weight: bold; color: white; text-decoration: none; display: block; margin-bottom: 30px; }
+  .app-sidebar .logo span { color: #52b788; }
+  .app-nav { display: flex; flex-direction: column; gap: 10px; }
+  .app-nav a { color: #b7e4c7; text-decoration: none; padding: 12px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .app-nav a:hover, .app-nav a.active { background: #1b4332; color: #ffffff; }
+  
+  .app-main { flex: 1; padding: 40px; max-width: 1000px; }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
-  .app-nav a { cursor: pointer; }
 
-  .profile-card {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid rgba(0,0,0,0.08);
-    margin-top: 16px;
-  }
-  .profile-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: #1b4332;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    font-weight: bold;
-    overflow: hidden;
-  }
+  .xp-badge-top { background: #d8f3dc; color: #1b4332; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 16px; display: inline-flex; align-items: center; gap: 6px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+  .card { background: white; border-radius: 16px; padding: 20px; border: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+  .card-category { font-size: 12px; color: #52b788; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; }
+  .card-title { font-size: 18px; font-weight: bold; color: #1b4332; margin-bottom: 8px; }
+  .card-info { font-size: 14px; color: #555; margin-bottom: 16px; line-height: 1.4; }
+
+  .btn-action { background: #1b4332; color: white; border: none; padding: 10px 16px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: bold; cursor: pointer; transition: 0.2s; display: block; width: 100%; box-sizing: border-box; }
+  .btn-action:hover { background: #2d6a4f; }
+  .btn-action:disabled { background: #ccc; cursor: not-allowed; }
+
+  .profile-card { display: flex; align-items: center; gap: 20px; background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 24px; }
+  .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: #1b4332; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; overflow: hidden; }
   .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  
-  .btn-buy, .btn-link {
-    background: #1b4332;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-buy:hover, .btn-link:hover { background: #2d6a4f; }
-  
-  .form-box {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 20px;
-    border: 1px solid #ddd;
-  }
-  .form-group { margin-bottom: 12px; }
-  .form-group label { display: block; margin-bottom: 4px; font-weight: 600; }
-  .form-group input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+
+  .form-box { background: #fff; padding: 24px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); margin-top: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; margin-bottom: 6px; font-weight: 600; }
+  .form-group input { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+
+  .purchased-item { background: #f8f9fa; border: 1px dashed #2d6a4f; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .purchased-code { font-size: 18px; font-weight: bold; color: #1b4332; background: #e8f5e9; padding: 6px 12px; border-radius: 6px; display: inline-block; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -66,92 +50,55 @@
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
     <nav class="app-nav">
-      <a class="nav-link active" data-tab="quests">🎯 Квесты</a>
-      <a class="nav-link" data-tab="shop">🛍 Магазин</a>
-      <a class="nav-link" data-tab="chats">💬 Чаты</a>
-      <a class="nav-link" data-tab="profile">👤 Профиль</a>
-      <a href="#" id="logoutBtn">🚪 Выйти</a>
+      <a class="nav-link active" data-tab="quests">🎯 Доступные квесты</a>
+      <a class="nav-link" data-tab="shop">🛍 Магазин наград</a>
+      <a class="nav-link" data-tab="profile">👤 Профиль и купоны</a>
+      <a href="#" id="logoutBtn" style="margin-top: auto; color: #ff8585;">🚪 Выйти</a>
     </nav>
   </aside>
 
   <main class="app-main">
 
-    <!-- КВЕСТЫ -->
+    <!-- ВКЛАДКА 1: КВЕСТЫ -->
     <section id="tab-quests" class="tab-content active">
-      <div class="app-topbar">
-        <div>
-          <h2 class="user-greeting">Привет!</h2>
-          <p style="margin:0;">Открытые квесты от организаций.</p>
-        </div>
+      <div class="app-topbar" style="display:flex; justify-shadow:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="margin:0; color:#1b4332;">Экологические квесты</h2>
+        <div class="xp-badge-top">⚡ <span class="userXPVal">0</span> XP</div>
       </div>
 
-      <div class="stat-row">
-        <div class="stat-card">
-          <div class="stat-num" id="statXP">500 XP</div>
-          <div class="stat-label">Мой баланс</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="statOpen">—</div>
-          <div class="stat-label">Открытых квестов</div>
-        </div>
-      </div>
-
-      <h3>Доступные квесты</h3>
-      <div class="quest-list" id="questList">
-        <div class="empty-state">Загружаем квесты…</div>
-      </div>
+      <div id="questsContainer" class="card-grid">Загрузка...</div>
     </section>
 
-    <!-- МАГАЗИН -->
+    <!-- ВКЛАДКА 2: МАГАЗИН -->
     <section id="tab-shop" class="tab-content">
-      <div class="app-topbar">
-        <div>
-          <h2>Магазин наград</h2>
-          <p style="margin:0;">Обменивай накопленные XP на купоны от партнёров.</p>
-        </div>
+      <div class="app-topbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="margin:0; color:#1b4332;">Магазин вознаграждений</h2>
+        <div class="xp-badge-top">⚡ <span class="userXPVal">0</span> XP</div>
       </div>
 
-      <div class="shop-grid" id="shopList">
-        <div class="empty-state">Загружаем награды…</div>
-      </div>
+      <div id="shopContainer" class="card-grid">Загрузка...</div>
     </section>
 
-    <!-- ЧАТЫ -->
-    <section id="tab-chats" class="tab-content">
-      <div class="app-topbar">
-        <h2>Сообщество</h2>
-      </div>
-      <div class="ticket">
-        <div class="ticket-icon">🤖</div>
-        <div>
-          <div class="ticket-tag">ИИ-ПОМОЩНИК</div>
-          <div class="ticket-title">Эко-Помощник Tera AI</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ПРОФИЛЬ -->
+    <!-- ВКЛАДКА 3: ПРОФИЛЬ -->
     <section id="tab-profile" class="tab-content">
       <div class="app-topbar">
-        <h2>Мой профиль</h2>
+        <h2 style="color:#1b4332;">Мой профиль</h2>
       </div>
 
       <div class="profile-card">
-        <div class="profile-avatar" id="profileAvatar">U</div>
-        <div class="profile-info">
-          <h3 id="profileName">Загрузка...</h3>
-          <p id="profileEmail">email@example.com</p>
-          <span class="profile-badge">🌱 Эко-Волонтёр</span>
+        <div class="profile-avatar" id="profileAvatar">V</div>
+        <div>
+          <h3 id="profileName" style="margin:0;">Загрузка...</h3>
+          <p id="profileEmail" style="margin:4px 0; color:#666;">email@example.com</p>
+          <div class="xp-badge-top" style="margin-top:8px;">Баланс: ⚡ <span class="userXPVal">0</span> XP</div>
         </div>
       </div>
 
-      <!-- Купленные купоны -->
-      <h3 style="margin-top: 24px;">Мои купленные купоны / Промокоды</h3>
-      <div id="myCouponsList">
-        <p style="color:#666;">У вас пока нет купленных купонов.</p>
+      <div class="form-box">
+        <h3>🎟 Мои приобретенные купоны</h3>
+        <div id="purchasedCouponsList">У вас пока нет купленных купонов.</div>
       </div>
 
-      <!-- Редактирование профиля -->
       <div class="form-box">
         <h3>Редактировать профиль</h3>
         <form id="editProfileForm">
@@ -160,10 +107,10 @@
             <input type="text" id="editName" required>
           </div>
           <div class="form-group">
-            <label>Ссылка на фото или Эмодзи для аватарки</label>
-            <input type="text" id="editAvatar" placeholder="https://... или 🌿">
+            <label>Аватар (Ссылка на фото или Эмодзи)</label>
+            <input type="text" id="editAvatar" placeholder="https://... или 🌱">
           </div>
-          <button type="submit" class="btn-buy">Сохранить изменения</button>
+          <button type="submit" class="btn-action" style="width:auto;">Сохранить изменения</button>
         </form>
       </div>
     </section>
@@ -174,9 +121,9 @@
 <script type="module">
   import { requireAuth, logout, loadQuests, loadCoupons, buyCoupon, updateUserProfile } from "../js/app.js";
 
-  let currentUserData = null;
+  let currentVolunteer = null;
 
-  // Навигация
+  // Навигация по вкладкам
   const navLinks = document.querySelectorAll('.app-nav .nav-link');
   const tabContents = document.querySelectorAll('.tab-content');
   navLinks.forEach(link => {
@@ -192,124 +139,175 @@
     });
   });
 
-  // Загрузка
+  // Авторизация
   requireAuth("volunteer", async (profile) => {
-    currentUserData = profile;
-    const userXP = profile.xp !== undefined ? profile.xp : 500;
-    
-    document.getElementById("statXP").textContent = `${userXP} XP`;
-    document.querySelectorAll(".user-greeting").forEach(el => el.textContent = `Привет, ${profile.name || "Волонтёр"}!`);
-    
-    document.getElementById("profileName").textContent = profile.name || "Волонтёр";
-    document.getElementById("profileEmail").textContent = profile.email;
-    document.getElementById("editName").value = profile.name || "";
-    document.getElementById("editAvatar").value = profile.avatar || "";
+    currentVolunteer = profile;
+    updateUIProfile();
+    refreshData();
+  });
 
-    // Аватарка
+  function updateUIProfile() {
+    const xp = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 500;
+    document.querySelectorAll(".userXPVal").forEach(el => el.textContent = xp);
+
+    document.getElementById("profileName").textContent = currentVolunteer.name || "Волонтёр";
+    document.getElementById("profileEmail").textContent = currentVolunteer.email;
+    document.getElementById("editName").value = currentVolunteer.name || "";
+    document.getElementById("editAvatar").value = currentVolunteer.avatar || "";
+
     const avatarEl = document.getElementById("profileAvatar");
-    if (profile.avatar && profile.avatar.startsWith("http")) {
-      avatarEl.innerHTML = `<img src="${profile.avatar}" alt="avatar">`;
-    } else if (profile.avatar) {
-      avatarEl.textContent = profile.avatar;
+    if (currentVolunteer.avatar && currentVolunteer.avatar.startsWith("http")) {
+      avatarEl.innerHTML = `<img src="${currentVolunteer.avatar}" alt="avatar">`;
+    } else if (currentVolunteer.avatar) {
+      avatarEl.textContent = currentVolunteer.avatar;
     } else {
-      avatarEl.textContent = (profile.name || "U").charAt(0);
+      avatarEl.textContent = (currentVolunteer.name || "V").charAt(0);
     }
 
-    // Вывод купленных купонов
-    const myCouponsList = document.getElementById("myCouponsList");
-    if (profile.purchasedCoupons && profile.purchasedCoupons.length > 0) {
-      myCouponsList.innerHTML = profile.purchasedCoupons.map(c => `
-        <div class="ticket" style="background:#e8f5e9; border:1px solid #c8e6c9; margin-top:10px;">
-          <div class="ticket-icon">🎟</div>
-          <div>
-            <div class="ticket-title">${c.title}</div>
-            <div class="ticket-reward" style="font-size:16px; color:#2e7d32; font-weight:bold;">
-              Промокод / Ссылка: ${c.code}
-            </div>
-            <small style="color:#666;">Куплено: ${c.boughtAt}</small>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    // 1. Загрузка Квестов
-    const quests = await loadQuests();
-    document.getElementById("statOpen").textContent = quests.length;
-    const questList = document.getElementById("questList");
-    
-    if (quests.length === 0) {
-      questList.innerHTML = `<div class="empty-state">Нет активных квестов</div>`;
-    } else {
-      questList.innerHTML = quests.map(q => `
-        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="ticket-icon">🎯</div>
-            <div>
-              <div class="ticket-tag">${(q.category || "ЗАДАНИЕ").toUpperCase()} · от ${q.ownerName || "Организации"}</div>
-              <div class="ticket-title">${q.title}</div>
-              <div class="ticket-reward">+ ${q.reward || "300 XP"}</div>
-            </div>
-          </div>
-          <div>
-            ${q.link ? `<a href="${q.link}" target="_blank" class="btn-link">Регистрация ↗</a>` : `<span style="color:#888;">Без записи</span>`}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    // 2. Загрузка Купонов
-    const coupons = await loadCoupons();
-    const shopList = document.getElementById("shopList");
+    // Отображение купленных купонов
+    const purchasedList = document.getElementById("purchasedCouponsList");
+    const coupons = currentVolunteer.purchasedCoupons || [];
     if (coupons.length === 0) {
-      shopList.innerHTML = `<div class="empty-state">В магазине пока нет товаров</div>`;
+      purchasedList.innerHTML = `<p style="color:#888;">Вы ещё не покупали купоны.</p>`;
     } else {
-      shopList.innerHTML = coupons.map(c => `
-        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="ticket-icon">🎁</div>
-            <div>
-              <div class="ticket-tag">${(c.category || "АКЦИЯ").toUpperCase()} · от ${c.ownerName || "Партнёра"}</div>
-              <div class="ticket-title">${c.title}</div>
-              <div class="ticket-reward">Цена: ${c.cost} XP</div>
-            </div>
-          </div>
-          <button class="btn-buy" data-id="${c.id}" data-cost="${c.cost}" data-title="${c.title}" data-code="${c.code || ''}">
-            Купить за ${c.cost} XP
-          </button>
+      purchasedList.innerHTML = coupons.map(c => `
+        <div class="purchased-item">
+          <strong>${c.title}</strong>
+          <div style="font-size:12px; color:#666; margin-top:2px;">Куплено: ${c.boughtAt}</div>
+          <div class="purchased-code">${c.code}</div>
         </div>
       `).join("");
+    }
+  }
 
-      // Навешиваем клик на кнопки покупки
-      document.querySelectorAll(".btn-buy[data-id]").forEach(btn => {
+  async function refreshData() {
+    // Загрузка квестов
+    const quests = await loadQuests();
+    const questsContainer = document.getElementById("questsContainer");
+    if (quests.length === 0) {
+      questsContainer.innerHTML = `<p style="color:#888;">Пока нет доступных квестов.</p>`;
+    } else {
+      questsContainer.innerHTML = quests.map(q => {
+        let spotsInfo = "";
+        if (!q.maxVolunteers) {
+          spotsInfo = "👥 Мест: Без ограничений";
+        } else {
+          const left = q.maxVolunteers - (q.registeredCount || 0);
+          spotsInfo = left > 0 ? `👥 Осталось мест: <b>${left} из ${q.maxVolunteers}</b>` : `<span style="color:red; font-weight:bold;">❌ Все места заняты</span>`;
+        }
+
+        return `
+          <div class="card">
+            <div>
+              <div class="card-category">${q.category || "Квест"}</div>
+              <div class="card-title">${q.title}</div>
+              <div class="card-info">
+                От: <b>${q.ownerName || "Организация"}</b><br>
+                Награда: <b>${q.reward}</b><br>
+                ${spotsInfo}
+              </div>
+            </div>
+            <a href="${q.link}" target="_blank" class="btn-action">Записаться на квест ↗</a>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Загрузка купонов в магазин
+    const coupons = await loadCoupons();
+    const shopContainer = document.getElementById("shopContainer");
+    const userXP = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 500;
+
+    if (coupons.length === 0) {
+      shopContainer.innerHTML = `<p style="color:#888;">В магазине пока нет товаров.</p>`;
+    } else {
+      shopContainer.innerHTML = coupons.map(c => {
+        const claimed = c.claimedCount || 0;
+        let isSoldOut = false;
+        let stockInfo = "";
+
+        if (!c.maxQuantity) {
+          stockInfo = "📦 В наличии: Много";
+        } else {
+          const remaining = c.maxQuantity - claimed;
+          if (remaining <= 0) {
+            isSoldOut = true;
+            stockInfo = "<b style='color:red;'>Закончились</b>";
+          } else {
+            stockInfo = `📦 Осталось: <b>${remaining} из ${c.maxQuantity} шт.</b>`;
+          }
+        }
+
+        const canAfford = userXP >= c.cost;
+        let btnText = `Получить за ${c.cost} XP`;
+        let isDisabled = false;
+
+        if (isSoldOut) {
+          btnText = "Распродано";
+          isDisabled = true;
+        } else if (!canAfford) {
+          btnText = `Не хватает XP (${c.cost} XP)`;
+          isDisabled = true;
+        }
+
+        return `
+          <div class="card">
+            <div>
+              <div class="card-category">${c.category || "Купон"}</div>
+              <div class="card-title">${c.title}</div>
+              <div class="card-info">
+                Партнёр: <b>${c.ownerName || "Кофейня/Магазин"}</b><br>
+                ${stockInfo}
+              </div>
+            </div>
+            <button class="btn-action btn-buy" data-id="${c.id}" ${isDisabled ? "disabled" : ""}>${btnText}</button>
+          </div>
+        `;
+      }).join("");
+
+      // Навешивание событий на кнопки покупки
+      document.querySelectorAll(".btn-buy").forEach(btn => {
         btn.addEventListener("click", async () => {
-          const coupon = {
-            id: btn.getAttribute("data-id"),
-            cost: Number(btn.getAttribute("data-cost")),
-            title: btn.getAttribute("data-title"),
-            code: btn.getAttribute("data-code")
-          };
-          const success = await buyCoupon(currentUserData, coupon);
-          if (success) location.reload();
+          const couponId = btn.getAttribute("data-id");
+          const selectedCoupon = coupons.find(item => item.id === couponId);
+          if (selectedCoupon && confirm(`Обменять ${selectedCoupon.cost} XP на "${selectedCoupon.title}"?`)) {
+            const success = await buyCoupon(currentVolunteer, selectedCoupon);
+            if (success) {
+              currentVolunteer.xp -= selectedCoupon.cost;
+              if (!currentVolunteer.purchasedCoupons) currentVolunteer.purchasedCoupons = [];
+              currentVolunteer.purchasedCoupons.push({
+                title: selectedCoupon.title,
+                code: selectedCoupon.code,
+                boughtAt: new Date().toLocaleString()
+              });
+              updateUIProfile();
+              refreshData();
+            }
+          }
         });
       });
     }
-  });
+  }
 
-  // Сохранение профиля
+  // Обновление профиля
   document.getElementById("editProfileForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const newName = document.getElementById("editName").value;
-    const newAvatar = document.getElementById("editAvatar").value;
-    await updateUserProfile(currentUserData.uid, { name: newName, avatar: newAvatar });
-    location.reload();
+    try {
+      const newName = document.getElementById("editName").value;
+      const newAvatar = document.getElementById("editAvatar").value;
+      await updateUserProfile(currentVolunteer.uid, { name: newName, avatar: newAvatar });
+      currentVolunteer.name = newName;
+      currentVolunteer.avatar = newAvatar;
+      updateUIProfile();
+    } catch (err) {
+      alert("Ошибка обновления: " + err.message);
+    }
   });
 
-  // Выход с подтверждением
+  // Выход
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
-    if (confirm("Вы уверены, что хотите выйти из аккаунта?")) {
-      logout();
-    }
+    if (confirm("Выйти из аккаунта?")) logout();
   });
 </script>
 

@@ -6,68 +6,43 @@
 <title>Кабинет Партнёра — Tera</title>
 <link rel="stylesheet" href="../css/style.css">
 <style>
+  body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; color: #333; }
+  .app-shell { display: flex; min-height: 100vh; }
+  .app-sidebar { width: 250px; background: #0f281e; color: white; padding: 20px; flex-shrink: 0; }
+  .app-sidebar .logo { font-size: 28px; font-weight: bold; color: white; text-decoration: none; display: block; margin-bottom: 30px; }
+  .app-sidebar .logo span { color: #52b788; }
+  .app-nav { display: flex; flex-direction: column; gap: 10px; }
+  .app-nav a { color: #b7e4c7; text-decoration: none; padding: 12px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .app-nav a:hover, .app-nav a.active { background: #1b4332; color: #ffffff; }
+  
+  .app-main { flex: 1; padding: 40px; max-width: 1000px; }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
-  .app-nav a { cursor: pointer; }
-
-  .profile-card {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid rgba(0,0,0,0.08);
-    margin-top: 16px;
-  }
-  .profile-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: #1b4332;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    font-weight: bold;
-    overflow: hidden;
-  }
-  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-  .form-box {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 20px;
-    border: 1px solid #ddd;
-  }
-  .form-group { margin-bottom: 12px; }
-  .form-group label { display: block; margin-bottom: 4px; font-weight: 600; }
-  .form-group input, .form-group select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
   
-  .btn-submit {
-    background: #1b4332;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-  }
+  .app-topbar h2 { margin: 0 0 20px 0; font-size: 28px; color: #1b4332; }
+  
+  .profile-card { display: flex; align-items: center; gap: 20px; background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 24px; }
+  .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: #1b4332; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; overflow: hidden; }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-badge { display: inline-block; background: #d8f3dc; color: #1b4332; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-top: 6px; }
+
+  .form-box { background: #fff; padding: 24px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  .form-box h3 { margin-top: 0; color: #1b4332; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
+  
+  .btn-submit { background: #1b4332; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; }
   .btn-submit:hover { background: #2d6a4f; }
 
-  .btn-delete {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 13px;
-  }
+  .item-card { background: #ffffff; padding: 16px 20px; border-radius: 12px; border: 1px solid #e0e0e0; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .item-title { font-weight: bold; font-size: 16px; color: #1b4332; }
+  .item-sub { font-size: 13px; color: #666; margin-top: 4px; }
+
+  .btn-delete { background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
   .btn-delete:hover { background: #bd2130; }
+  
+  .checkbox-inline { display: flex; align-items: center; gap: 8px; font-weight: normal; font-size: 14px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -76,22 +51,22 @@
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
     <nav class="app-nav">
-      <a class="nav-link active" data-tab="quests" id="navQuests">🎯 Мои квесты</a>
-      <a class="nav-link" data-tab="shop" id="navShop">🛍 Магазин наград</a>
+      <a class="nav-link active" data-tab="quests">🎯 Мои квесты</a>
+      <a class="nav-link" data-tab="shop">🛍 Магазин наград</a>
       <a class="nav-link" data-tab="profile">👤 Профиль</a>
-      <a href="#" id="logoutBtn">🚪 Выйти</a>
+      <a href="#" id="logoutBtn" style="margin-top: auto; color: #ff8585;">🚪 Выйти</a>
     </nav>
   </aside>
 
   <main class="app-main">
 
-    <!-- ВКЛАДКА 1: КВЕСТЫ (Организация) -->
+    <!-- ВКЛАДКА 1: КВЕСТЫ -->
     <section id="tab-quests" class="tab-content active">
       <div class="app-topbar">
         <h2 id="partnerTitle">Управление заданиями</h2>
       </div>
 
-      <div id="questPermissionBlock" class="form-box">
+      <div class="form-box">
         <h3>➕ Опубликовать новый квест</h3>
         <form id="createQuestForm">
           <div class="form-group">
@@ -104,31 +79,41 @@
               <option value="Субботник">Субботник</option>
               <option value="Сбор макулатуры">Сбор макулатуры</option>
               <option value="Посадка деревьев">Посадка деревьев</option>
+              <option value="Эко-просвещение">Эко-просвещение</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Ссылка для записи волонтеров (Google Форма / Сайт)</label>
+            <label>Ссылка для записи волонтёров (Google Форма / Сайт)</label>
             <input type="url" id="questLink" placeholder="https://forms.gle/..." required>
           </div>
           <div class="form-group">
             <label>Вознаграждение для волонтёра</label>
             <input type="text" id="questReward" placeholder="Например: +300 XP" required>
           </div>
+          <div class="form-group">
+            <label>Максимальное количество волонтёров</label>
+            <div style="display:flex; gap:12px; align-items:center;">
+              <input type="number" id="questMaxVolunteers" placeholder="Например: 15" min="1">
+              <label class="checkbox-inline">
+                <input type="checkbox" id="questUnlimited"> Без ограничений
+              </label>
+            </div>
+          </div>
           <button type="submit" class="btn-submit">Опубликовать квест</button>
         </form>
       </div>
 
-      <h3 style="margin-top:24px;">Созданные квесты</h3>
+      <h3>Созданные квесты</h3>
       <div id="myQuestList">Загрузка...</div>
     </section>
 
-    <!-- ВКЛАДКА 2: МАГАЗИН (Кофейня / Партнёр) -->
+    <!-- ВКЛАДКА 2: МАГАЗИН -->
     <section id="tab-shop" class="tab-content">
       <div class="app-topbar">
         <h2>Управление наградами</h2>
       </div>
 
-      <div id="shopPermissionBlock" class="form-box">
+      <div class="form-box">
         <h3>🛍 Выставить товар / купон в магазин</h3>
         <form id="createCouponForm">
           <div class="form-group">
@@ -144,18 +129,27 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Промокод, ссылка на QR или инструкция для волонтёра</label>
-            <input type="text" id="couponCode" placeholder="Например: COFFEE50 или https://qr-link..." required>
+            <label>Промокод или инструкция для волонтёра</label>
+            <input type="text" id="couponCode" placeholder="Например: COFFEE50" required>
           </div>
           <div class="form-group">
             <label>Стоимость в очках (XP)</label>
-            <input type="number" id="couponCost" placeholder="Например: 300" required>
+            <input type="number" id="couponCost" placeholder="Например: 300" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>Количество купонов в наличии</label>
+            <div style="display:flex; gap:12px; align-items:center;">
+              <input type="number" id="couponMaxQuantity" placeholder="Например: 20" min="1">
+              <label class="checkbox-inline">
+                <input type="checkbox" id="couponUnlimited"> Без ограничений
+              </label>
+            </div>
           </div>
           <button type="submit" class="btn-submit">Опубликовать в магазине</button>
         </form>
       </div>
 
-      <h3 style="margin-top:24px;">Выставленные купоны</h3>
+      <h3>Выставленные купоны</h3>
       <div id="myCouponList">Загрузка...</div>
     </section>
 
@@ -167,9 +161,9 @@
 
       <div class="profile-card">
         <div class="profile-avatar" id="profileAvatar">P</div>
-        <div class="profile-info">
-          <h3 id="profileName">Загрузка...</h3>
-          <p id="profileEmail">email@example.com</p>
+        <div>
+          <h3 id="profileName" style="margin:0;">Загрузка...</h3>
+          <p id="profileEmail" style="margin:4px 0; color:#666;">email@example.com</p>
           <span class="profile-badge">🤝 Партнёр Tera</span>
         </div>
       </div>
@@ -198,7 +192,20 @@
 
   let currentPartner = null;
 
-  // Навигация
+  // Блокировка ввода при выборе "Без ограничений"
+  document.getElementById("questUnlimited").addEventListener("change", (e) => {
+    const input = document.getElementById("questMaxVolunteers");
+    input.value = "";
+    input.disabled = e.target.checked;
+  });
+
+  document.getElementById("couponUnlimited").addEventListener("change", (e) => {
+    const input = document.getElementById("couponMaxQuantity");
+    input.value = "";
+    input.disabled = e.target.checked;
+  });
+
+  // Переключение вкладок
   const navLinks = document.querySelectorAll('.app-nav .nav-link');
   const tabContents = document.querySelectorAll('.tab-content');
   navLinks.forEach(link => {
@@ -214,7 +221,7 @@
     });
   });
 
-  // Авторизация
+  // Авторизация и загрузка
   requireAuth("partner", async (profile) => {
     currentPartner = profile;
 
@@ -233,127 +240,160 @@
       avatarEl.textContent = (profile.name || "P").charAt(0);
     }
 
-    const canQuests = profile.permissions?.quests !== false;
-    const canCoupons = profile.permissions?.coupons !== false;
-
-    if (!canQuests) {
-      document.getElementById("questPermissionBlock").innerHTML = `<p style="color:#d32f2f;">⛔ У вашей организации нет прав на создание квестов.</p>`;
-    }
-    if (!canCoupons) {
-      document.getElementById("shopPermissionBlock").innerHTML = `<p style="color:#d32f2f;">⛔ У вашего аккаунта нет прав на добавление товаров в магазин.</p>`;
-    }
-
     refreshContent();
   });
 
   async function refreshContent() {
-    // Список квестов с кнопкой "Удалить"
-    const quests = await loadQuests(currentPartner.uid);
-    const myQuestList = document.getElementById("myQuestList");
-    if (quests.length === 0) {
-      myQuestList.innerHTML = `<p style="color:#888;">Вы ещё не публиковали квесты.</p>`;
-    } else {
-      myQuestList.innerHTML = quests.map(q => `
-        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="ticket-icon">🎯</div>
-            <div>
-              <div class="ticket-title">${q.title}</div>
-              <div class="ticket-reward">Награда: ${q.reward} | Ссылка: <a href="${q.link}" target="_blank">Форма ↗</a></div>
+    // Список квестов
+    try {
+      const quests = await loadQuests(currentPartner.uid);
+      const myQuestList = document.getElementById("myQuestList");
+      if (quests.length === 0) {
+        myQuestList.innerHTML = `<p style="color:#888;">Вы ещё не публиковали квесты.</p>`;
+      } else {
+        myQuestList.innerHTML = quests.map(q => {
+          const limitText = q.maxVolunteers 
+            ? `Ограничение: ${q.maxVolunteers} волонтеров` 
+            : `Без ограничений по местaм`;
+          return `
+            <div class="item-card">
+              <div>
+                <div class="item-title">🎯 ${q.title}</div>
+                <div class="item-sub">Награда: ${q.reward} | ${limitText}</div>
+              </div>
+              <button class="btn-delete btn-delete-quest" data-id="${q.id}">Удалить</button>
             </div>
-          </div>
-          <button class="btn-delete btn-delete-quest" data-id="${q.id}">Удалить</button>
-        </div>
-      `).join("");
+          `;
+        }).join("");
+      }
+    } catch (e) {
+      console.error(e);
     }
 
-    // Список купонов с кнопкой "Удалить"
-    const coupons = await loadCoupons(currentPartner.uid);
-    const myCouponList = document.getElementById("myCouponList");
-    if (coupons.length === 0) {
-      myCouponList.innerHTML = `<p style="color:#888;">Вы ещё не выставляли купоны.</p>`;
-    } else {
-      myCouponList.innerHTML = coupons.map(c => `
-        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="ticket-icon">🎁</div>
-            <div>
-              <div class="ticket-title">${c.title} (${c.cost} XP)</div>
-              <div class="ticket-reward">Код/QR: <b>${c.code}</b></div>
+    // Список купонов
+    try {
+      const coupons = await loadCoupons(currentPartner.uid);
+      const myCouponList = document.getElementById("myCouponList");
+      if (coupons.length === 0) {
+        myCouponList.innerHTML = `<p style="color:#888;">Вы ещё не выставляли купоны.</p>`;
+      } else {
+        myCouponList.innerHTML = coupons.map(c => {
+          const claimed = c.claimedCount || 0;
+          const limitText = c.maxQuantity 
+            ? `Выдано: ${claimed} из ${c.maxQuantity} шт.` 
+            : `Забрали: ${claimed} шт. (Без ограничений)`;
+          return `
+            <div class="item-card">
+              <div>
+                <div class="item-title">🎁 ${c.title} (${c.cost} XP)</div>
+                <div class="item-sub">Код: <b>${c.code}</b> | ${limitText}</div>
+              </div>
+              <button class="btn-delete btn-delete-coupon" data-id="${c.id}">Удалить</button>
             </div>
-          </div>
-          <button class="btn-delete btn-delete-coupon" data-id="${c.id}">Удалить</button>
-        </div>
-      `).join("");
+          `;
+        }).join("");
+      }
+    } catch (e) {
+      console.error(e);
     }
 
-    // Слушатели на кнопки удаления квестов
+    // Обработчики удаления квестов
     document.querySelectorAll(".btn-delete-quest").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (confirm("Вы уверены, что хотите удалить этот квест?")) {
-          await deleteQuest(btn.getAttribute("data-id"));
-          refreshContent();
+          try {
+            await deleteQuest(btn.getAttribute("data-id"));
+            alert("Квест успешно удалён!");
+            refreshContent();
+          } catch (err) {
+            alert("Ошибка при удалении: " + err.message);
+          }
         }
       });
     });
 
-    // Слушатели на кнопки удаления купонов
+    // Обработчики удаления купонов
     document.querySelectorAll(".btn-delete-coupon").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (confirm("Вы уверены, что хотите удалить этот купон?")) {
-          await deleteCoupon(btn.getAttribute("data-id"));
-          refreshContent();
+          try {
+            await deleteCoupon(btn.getAttribute("data-id"));
+            alert("Купон успешно удалён!");
+            refreshContent();
+          } catch (err) {
+            alert("Ошибка при удалении: " + err.message);
+          }
         }
       });
     });
   }
 
   // Создание квеста
-  document.getElementById("createQuestForm")?.addEventListener("submit", async (e) => {
+  document.getElementById("createQuestForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    await createQuest({
-      title: document.getElementById("questTitle").value,
-      category: document.getElementById("questCategory").value,
-      link: document.getElementById("questLink").value,
-      reward: document.getElementById("questReward").value,
-      ownerName: currentPartner.name || "Партнёр"
-    });
-    alert("Квест успешно опубликован!");
-    document.getElementById("createQuestForm").reset();
-    refreshContent();
+    const isUnlimited = document.getElementById("questUnlimited").checked;
+    const maxVal = document.getElementById("questMaxVolunteers").value;
+
+    try {
+      await createQuest({
+        title: document.getElementById("questTitle").value,
+        category: document.getElementById("questCategory").value,
+        link: document.getElementById("questLink").value,
+        reward: document.getElementById("questReward").value,
+        maxVolunteers: isUnlimited ? null : maxVal,
+        ownerName: currentPartner.name || "Партнёр"
+      });
+      alert("Квест успешно опубликован!");
+      document.getElementById("createQuestForm").reset();
+      document.getElementById("questMaxVolunteers").disabled = false;
+      refreshContent();
+    } catch (err) {
+      alert("Ошибка при создании: " + err.message);
+    }
   });
 
   // Создание купона
-  document.getElementById("createCouponForm")?.addEventListener("submit", async (e) => {
+  document.getElementById("createCouponForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    await createCoupon({
-      title: document.getElementById("couponTitle").value,
-      category: document.getElementById("couponCategory").value,
-      code: document.getElementById("couponCode").value,
-      cost: document.getElementById("couponCost").value,
-      ownerName: currentPartner.name || "Партнёр"
-    });
-    alert("Купон успешно опубликован в магазине!");
-    document.getElementById("createCouponForm").reset();
-    refreshContent();
+    const isUnlimited = document.getElementById("couponUnlimited").checked;
+    const maxVal = document.getElementById("couponMaxQuantity").value;
+
+    try {
+      await createCoupon({
+        title: document.getElementById("couponTitle").value,
+        category: document.getElementById("couponCategory").value,
+        code: document.getElementById("couponCode").value,
+        cost: document.getElementById("couponCost").value,
+        maxQuantity: isUnlimited ? null : maxVal,
+        ownerName: currentPartner.name || "Партнёр"
+      });
+      alert("Купон успешно опубликован!");
+      document.getElementById("createCouponForm").reset();
+      document.getElementById("couponMaxQuantity").disabled = false;
+      refreshContent();
+    } catch (err) {
+      alert("Ошибка при создании: " + err.message);
+    }
   });
 
-  // Редактирование профиля
+  // Сохранение профиля
   document.getElementById("editProfileForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    await updateUserProfile(currentPartner.uid, {
-      name: document.getElementById("editName").value,
-      avatar: document.getElementById("editAvatar").value
-    });
-    location.reload();
+    try {
+      await updateUserProfile(currentPartner.uid, {
+        name: document.getElementById("editName").value,
+        avatar: document.getElementById("editAvatar").value
+      });
+      location.reload();
+    } catch (err) {
+      alert("Ошибка обновления профиля: " + err.message);
+    }
   });
 
   // Выход
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
-    if (confirm("Вы уверены, что хотите выйти из аккаунта?")) {
-      logout();
-    }
+    if (confirm("Выйти из аккаунта?")) logout();
   });
 </script>
 

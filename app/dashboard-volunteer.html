@@ -3,21 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Личный кабинет — Tera</title>
+<title>Кабинет Волонтёра — Tera</title>
 <link rel="stylesheet" href="../css/style.css">
 <style>
-  /* Вкладки */
-  .tab-content {
-    display: none;
-  }
-  .tab-content.active {
-    display: block;
-  }
-  .app-nav a {
-    cursor: pointer;
-  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .app-nav a { cursor: pointer; }
 
-  /* Стили для Профиля */
   .profile-card {
     display: flex;
     align-items: center;
@@ -39,36 +31,38 @@
     justify-content: center;
     font-size: 28px;
     font-weight: bold;
-    text-transform: uppercase;
+    overflow: hidden;
   }
-  .profile-info h3 {
-    margin: 0 0 4px 0;
-    font-size: 22px;
-  }
-  .profile-info p {
-    margin: 0 0 8px 0;
-    color: #666;
-  }
-  .profile-badge {
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .btn-buy, .btn-link {
+    background: #1b4332;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
     display: inline-block;
-    padding: 4px 12px;
-    background: #e8f5e9;
-    color: #2e7d32;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
   }
-  .shop-grid, .chat-list {
-    display: grid;
-    gap: 16px;
-    margin-top: 16px;
+  .btn-buy:hover, .btn-link:hover { background: #2d6a4f; }
+  
+  .form-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    border: 1px solid #ddd;
   }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; margin-bottom: 4px; font-weight: 600; }
+  .form-group input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
 </style>
 </head>
 <body>
 
 <div class="app-shell">
-  <!-- Боковое меню -->
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
     <nav class="app-nav">
@@ -80,30 +74,25 @@
     </nav>
   </aside>
 
-  <!-- Основной контент -->
   <main class="app-main">
 
-    <!-- ВКЛАДКА 1: КВЕСТЫ -->
+    <!-- КВЕСТЫ -->
     <section id="tab-quests" class="tab-content active">
       <div class="app-topbar">
         <div>
           <h2 class="user-greeting">Привет!</h2>
-          <p style="margin:0;">Вот открытые квесты от организаций.</p>
+          <p style="margin:0;">Открытые квесты от организаций.</p>
         </div>
       </div>
 
       <div class="stat-row">
         <div class="stat-card">
+          <div class="stat-num" id="statXP">500 XP</div>
+          <div class="stat-label">Мой баланс</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-num" id="statOpen">—</div>
           <div class="stat-label">Открытых квестов</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">0</div>
-          <div class="stat-label">Выполнено</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">0</div>
-          <div class="stat-label">Купонов получено</div>
         </div>
       </div>
 
@@ -113,94 +102,69 @@
       </div>
     </section>
 
-    <!-- ВКЛАДКА 2: МАГАЗИН -->
+    <!-- МАГАЗИН -->
     <section id="tab-shop" class="tab-content">
       <div class="app-topbar">
         <div>
           <h2>Магазин наград</h2>
-          <p style="margin:0;">Обменивай накопленные баллы на бонусы от партнеров.</p>
+          <p style="margin:0;">Обменивай накопленные XP на купоны от партнёров.</p>
         </div>
       </div>
 
       <div class="shop-grid" id="shopList">
-        <div class="empty-state">Загружаем награды и купоны…</div>
+        <div class="empty-state">Загружаем награды…</div>
       </div>
     </section>
 
-    <!-- ВКЛАДКА 3: ЧАТЫ -->
+    <!-- ЧАТЫ -->
     <section id="tab-chats" class="tab-content">
       <div class="app-topbar">
-        <div>
-          <h2>Сообщество и Чаты</h2>
-          <p style="margin:0;">Общайся с волонтерами и задавай вопросы Эко-Помощнику.</p>
-        </div>
+        <h2>Сообщество</h2>
       </div>
-
-      <div class="chat-list">
-        <div class="ticket">
-          <div class="ticket-icon">🤖</div>
-          <div>
-            <div class="ticket-tag">ИИ-ПОМОЩНИК</div>
-            <div class="ticket-title">Эко-Помощник Tera AI</div>
-            <div class="ticket-reward">Задай вопрос об экологии и акциях</div>
-          </div>
-        </div>
-        <div class="ticket">
-          <div class="ticket-icon">💬</div>
-          <div>
-            <div class="ticket-tag">ОБЩИЙ ЧАТ</div>
-            <div class="ticket-title">#сообщество-волонтеров</div>
-            <div class="ticket-reward">Обсуждение совместных выездов</div>
-          </div>
+      <div class="ticket">
+        <div class="ticket-icon">🤖</div>
+        <div>
+          <div class="ticket-tag">ИИ-ПОМОЩНИК</div>
+          <div class="ticket-title">Эко-Помощник Tera AI</div>
         </div>
       </div>
     </section>
 
-    <!-- ВКЛАДКА 4: ПРОФИЛЬ -->
+    <!-- ПРОФИЛЬ -->
     <section id="tab-profile" class="tab-content">
       <div class="app-topbar">
-        <div>
-          <h2>Мой профиль</h2>
-          <p style="margin:0;">Управление аккаунтом и личные достижения.</p>
-        </div>
+        <h2>Мой профиль</h2>
       </div>
 
-      <!-- Карточка профиля -->
       <div class="profile-card">
         <div class="profile-avatar" id="profileAvatar">U</div>
         <div class="profile-info">
           <h3 id="profileName">Загрузка...</h3>
           <p id="profileEmail">email@example.com</p>
-          <span class="profile-badge" id="profileRole">🌱 Эко-Волонтёр</span>
+          <span class="profile-badge">🌱 Эко-Волонтёр</span>
         </div>
       </div>
 
-      <!-- Статистика волонтера -->
-      <h3 style="margin-top: 24px;">Статистика и достижения</h3>
-      <div class="stat-row">
-        <div class="stat-card">
-          <div class="stat-num">0 XP</div>
-          <div class="stat-label">Накоплено опыта</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">0</div>
-          <div class="stat-label">Выполнено квестов</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">0</div>
-          <div class="stat-label">Спасенных деревьев</div>
-        </div>
+      <!-- Купленные купоны -->
+      <h3 style="margin-top: 24px;">Мои купленные купоны / Промокоды</h3>
+      <div id="myCouponsList">
+        <p style="color:#666;">У вас пока нет купленных купонов.</p>
       </div>
 
-      <!-- Награды -->
-      <h3 style="margin-top: 24px;">Мои награды</h3>
-      <div class="ticket">
-        <div class="ticket-icon">🏆</div>
-        <div>
-          <div class="ticket-tag">ДОСТИЖЕНИЕ</div>
-          <div class="ticket-title">Первый шаг</div>
-          <div class="ticket-reward">Зарегистрировался в системе Tera</div>
-        </div>
+      <!-- Редактирование профиля -->
+      <div class="form-box">
+        <h3>Редактировать профиль</h3>
+        <form id="editProfileForm">
+          <div class="form-group">
+            <label>Имя и Фамилия</label>
+            <input type="text" id="editName" required>
+          </div>
+          <div class="form-group">
+            <label>Ссылка на фото или Эмодзи для аватарки</label>
+            <input type="text" id="editAvatar" placeholder="https://... или 🌿">
+          </div>
+          <button type="submit" class="btn-buy">Сохранить изменения</button>
+        </form>
       </div>
     </section>
 
@@ -208,96 +172,144 @@
 </div>
 
 <script type="module">
-  import { requireAuth, logout, loadQuests, loadCoupons } from "../js/app.js";
+  import { requireAuth, logout, loadQuests, loadCoupons, buyCoupon, updateUserProfile } from "../js/app.js";
 
-  // Переключение вкладок
+  let currentUserData = null;
+
+  // Навигация
   const navLinks = document.querySelectorAll('.app-nav .nav-link');
   const tabContents = document.querySelectorAll('.tab-content');
-
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetTab = link.getAttribute('data-tab');
-
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
-
-      tabContents.forEach(content => {
-        content.classList.remove('active');
-        if (content.id === `tab-${targetTab}`) {
-          content.classList.add('active');
-        }
+      tabContents.forEach(c => {
+        c.classList.remove('active');
+        if (c.id === `tab-${targetTab}`) c.classList.add('active');
       });
     });
   });
 
-  // Авторизация и загрузка данных
+  // Загрузка
   requireAuth("volunteer", async (profile) => {
-    const userName = profile.name || "Волонтёр";
-    const userEmail = profile.email || "Пользователь";
-
-    document.querySelectorAll(".user-greeting").forEach(el => {
-      el.textContent = `Привет, ${userName}!`;
-    });
+    currentUserData = profile;
+    const userXP = profile.xp !== undefined ? profile.xp : 500;
     
-    document.getElementById("profileName").textContent = userName;
-    document.getElementById("profileEmail").textContent = userEmail;
-    document.getElementById("profileAvatar").textContent = userName.charAt(0);
+    document.getElementById("statXP").textContent = `${userXP} XP`;
+    document.querySelectorAll(".user-greeting").forEach(el => el.textContent = `Привет, ${profile.name || "Волонтёр"}!`);
+    
+    document.getElementById("profileName").textContent = profile.name || "Волонтёр";
+    document.getElementById("profileEmail").textContent = profile.email;
+    document.getElementById("editName").value = profile.name || "";
+    document.getElementById("editAvatar").value = profile.avatar || "";
 
-    // 1. Загрузка квестов
-    const questList = document.getElementById("questList");
-    try {
-      const quests = await loadQuests();
-      const openQuests = quests.filter(q => q.status !== "closed");
-      document.getElementById("statOpen").textContent = openQuests.length;
-
-      if (openQuests.length === 0) {
-        questList.innerHTML = `<div class="empty-state">Пока нет открытых квестов. Загляните позже — партнёры уже готовят задания 🌱</div>`;
-      } else {
-        questList.innerHTML = openQuests.map(q => `
-          <div class="ticket">
-            <div class="ticket-icon">🎯</div>
-            <div>
-              <div class="ticket-tag">${(q.category || "ЗАДАНИЕ").toUpperCase()} · от ${q.ownerName || "организации"}</div>
-              <div class="ticket-title">${q.title}</div>
-              <div class="ticket-reward">+ купон · ${q.reward || "уточняется"}</div>
-            </div>
-          </div>
-        `).join("");
-      }
-    } catch (e) {
-      questList.innerHTML = `<div class="empty-state">Не удалось загрузить квесты.</div>`;
-      console.error(e);
+    // Аватарка
+    const avatarEl = document.getElementById("profileAvatar");
+    if (profile.avatar && profile.avatar.startsWith("http")) {
+      avatarEl.innerHTML = `<img src="${profile.avatar}" alt="avatar">`;
+    } else if (profile.avatar) {
+      avatarEl.textContent = profile.avatar;
+    } else {
+      avatarEl.textContent = (profile.name || "U").charAt(0);
     }
 
-    // 2. Загрузка товаров и купонов в Магазин
-    const shopList = document.getElementById("shopList");
-    try {
-      const coupons = await loadCoupons();
-      if (coupons.length === 0) {
-        shopList.innerHTML = `<div class="empty-state">В магазине пока нет доступных товаров. Партнёры скоро добавят новые награды! 🛍</div>`;
-      } else {
-        shopList.innerHTML = coupons.map(c => `
-          <div class="ticket">
-            <div class="ticket-icon">🎁</div>
+    // Вывод купленных купонов
+    const myCouponsList = document.getElementById("myCouponsList");
+    if (profile.purchasedCoupons && profile.purchasedCoupons.length > 0) {
+      myCouponsList.innerHTML = profile.purchasedCoupons.map(c => `
+        <div class="ticket" style="background:#e8f5e9; border:1px solid #c8e6c9; margin-top:10px;">
+          <div class="ticket-icon">🎟</div>
+          <div>
+            <div class="ticket-title">${c.title}</div>
+            <div class="ticket-reward" style="font-size:16px; color:#2e7d32; font-weight:bold;">
+              Промокод / Ссылка: ${c.code}
+            </div>
+            <small style="color:#666;">Куплено: ${c.boughtAt}</small>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 1. Загрузка Квестов
+    const quests = await loadQuests();
+    document.getElementById("statOpen").textContent = quests.length;
+    const questList = document.getElementById("questList");
+    
+    if (quests.length === 0) {
+      questList.innerHTML = `<div class="empty-state">Нет активных квестов</div>`;
+    } else {
+      questList.innerHTML = quests.map(q => `
+        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="ticket-icon">🎯</div>
             <div>
-              <div class="ticket-tag">${(c.category || "АКЦИЯ").toUpperCase()} · от ${c.ownerName || "партнёра"}</div>
-              <div class="ticket-title">${c.title}</div>
-              <div class="ticket-reward">Стоимость: ${c.cost} XP</div>
+              <div class="ticket-tag">${(q.category || "ЗАДАНИЕ").toUpperCase()} · от ${q.ownerName || "Организации"}</div>
+              <div class="ticket-title">${q.title}</div>
+              <div class="ticket-reward">+ ${q.reward || "300 XP"}</div>
             </div>
           </div>
-        `).join("");
-      }
-    } catch (e) {
-      shopList.innerHTML = `<div class="empty-state">Не удалось загрузить товары магазина.</div>`;
-      console.error(e);
+          <div>
+            ${q.link ? `<a href="${q.link}" target="_blank" class="btn-link">Регистрация ↗</a>` : `<span style="color:#888;">Без записи</span>`}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 2. Загрузка Купонов
+    const coupons = await loadCoupons();
+    const shopList = document.getElementById("shopList");
+    if (coupons.length === 0) {
+      shopList.innerHTML = `<div class="empty-state">В магазине пока нет товаров</div>`;
+    } else {
+      shopList.innerHTML = coupons.map(c => `
+        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="ticket-icon">🎁</div>
+            <div>
+              <div class="ticket-tag">${(c.category || "АКЦИЯ").toUpperCase()} · от ${c.ownerName || "Партнёра"}</div>
+              <div class="ticket-title">${c.title}</div>
+              <div class="ticket-reward">Цена: ${c.cost} XP</div>
+            </div>
+          </div>
+          <button class="btn-buy" data-id="${c.id}" data-cost="${c.cost}" data-title="${c.title}" data-code="${c.code || ''}">
+            Купить за ${c.cost} XP
+          </button>
+        </div>
+      `).join("");
+
+      // Навешиваем клик на кнопки покупки
+      document.querySelectorAll(".btn-buy[data-id]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const coupon = {
+            id: btn.getAttribute("data-id"),
+            cost: Number(btn.getAttribute("data-cost")),
+            title: btn.getAttribute("data-title"),
+            code: btn.getAttribute("data-code")
+          };
+          const success = await buyCoupon(currentUserData, coupon);
+          if (success) location.reload();
+        });
+      });
     }
   });
 
-  // Выход
+  // Сохранение профиля
+  document.getElementById("editProfileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newName = document.getElementById("editName").value;
+    const newAvatar = document.getElementById("editAvatar").value;
+    await updateUserProfile(currentUserData.uid, { name: newName, avatar: newAvatar });
+    location.reload();
+  });
+
+  // Выход с подтверждением
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
-    logout();
+    if (confirm("Вы уверены, что хотите выйти из аккаунта?")) {
+      logout();
+    }
   });
 </script>
 

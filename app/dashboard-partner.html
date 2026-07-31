@@ -3,86 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Кабинет партнёра — Tera</title>
+<title>Кабинет Партнёра — Tera</title>
 <link rel="stylesheet" href="../css/style.css">
 <style>
   .tab-content { display: none; }
   .tab-content.active { display: block; }
   .app-nav a { cursor: pointer; }
 
-  .form-card {
+  .profile-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
     background: #ffffff;
     padding: 24px;
     border-radius: 16px;
     border: 1px solid rgba(0,0,0,0.08);
-    margin-bottom: 24px;
+    margin-top: 16px;
   }
-  .form-group {
-    margin-bottom: 16px;
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #1b4332;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    overflow: hidden;
   }
-  .form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-    font-size: 14px;
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .form-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    border: 1px solid #ddd;
   }
-  .form-group input, .form-group select {
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; margin-bottom: 4px; font-weight: 600; }
+  .form-group input, .form-group select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+  
   .btn-submit {
     background: #1b4332;
     color: white;
-    padding: 12px 20px;
     border: none;
+    padding: 10px 20px;
     border-radius: 8px;
-    font-weight: bold;
     cursor: pointer;
+    font-weight: bold;
   }
-  .btn-submit:hover {
-    background: #2d6a4f;
-  }
-  .permission-denied {
-    background: #fff3cd;
-    color: #856404;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-  }
+  .btn-submit:hover { background: #2d6a4f; }
 </style>
 </head>
 <body>
 
 <div class="app-shell">
-  <!-- Боковое меню -->
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
     <nav class="app-nav">
-      <a class="nav-link active" data-tab="quests">🎯 Мои квесты</a>
-      <a class="nav-link" data-tab="coupons">🛍 Магазин наград</a>
+      <a class="nav-link active" data-tab="quests" id="navQuests">🎯 Мои квесты</a>
+      <a class="nav-link" data-tab="shop" id="navShop">🛍 Магазин наград</a>
       <a class="nav-link" data-tab="profile">👤 Профиль</a>
       <a href="#" id="logoutBtn">🚪 Выйти</a>
     </nav>
   </aside>
 
-  <!-- Основной контент -->
   <main class="app-main">
 
-    <!-- ВКЛАДКА 1: КВЕСТЫ ПАРТНЕРА -->
+    <!-- ВКЛАДКА 1: КВЕСТЫ (Организация) -->
     <section id="tab-quests" class="tab-content active">
       <div class="app-topbar">
-        <div>
-          <h2 class="partner-name">Кабинет партнера</h2>
-          <p style="margin:0;">Публикуйте задания и экологические квесты для волонтёров.</p>
-        </div>
+        <h2 id="partnerTitle">Управление заданиями</h2>
       </div>
 
-      <div id="questPermissionBlock"></div>
-
-      <div class="form-card" id="questFormContainer">
+      <div id="questPermissionBlock" class="form-box">
         <h3>➕ Опубликовать новый квест</h3>
         <form id="createQuestForm">
           <div class="form-group">
@@ -93,80 +90,92 @@
             <label>Категория</label>
             <select id="questCategory">
               <option value="Субботник">Субботник</option>
-              <option value="Сбор сырья">Сбор сырья</option>
-              <option value="Помощь animal">Забота о животных</option>
-              <option value="Эко-просвещение">Эко-просвещение</option>
+              <option value="Сбор макулатуры">Сбор макулатуры</option>
+              <option value="Посадка деревьев">Посадка деревьев</option>
             </select>
           </div>
           <div class="form-group">
+            <label>Ссылка для записи волонтеров (Google Форма / Сайт)</label>
+            <input type="url" id="questLink" placeholder="https://forms.gle/..." required>
+          </div>
+          <div class="form-group">
             <label>Вознаграждение для волонтёра</label>
-            <input type="text" id="questReward" placeholder="Например: +150 XP и промокод на кофе" required>
+            <input type="text" id="questReward" placeholder="Например: +300 XP" required>
           </div>
           <button type="submit" class="btn-submit">Опубликовать квест</button>
         </form>
       </div>
 
-      <h3>Созданные квесты</h3>
-      <div class="quest-list" id="myQuestList">
-        <div class="empty-state">Загружаем ваши квесты…</div>
-      </div>
+      <h3 style="margin-top:24px;">Созданные квесты</h3>
+      <div id="myQuestList">Загрузка...</div>
     </section>
 
-    <!-- ВКЛАДКА 2: КУПОНЫ И МАГАЗИН -->
-    <section id="tab-coupons" class="tab-content">
+    <!-- ВКЛАДКА 2: МАГАЗИН (Кофейня / Партнёр) -->
+    <section id="tab-shop" class="tab-content">
       <div class="app-topbar">
-        <div>
-          <h2>Управление наградами</h2>
-          <p style="margin:0;">Выставляйте товары и купоны для витрины Магазина.</p>
-        </div>
+        <h2>Управление наградами</h2>
       </div>
 
-      <div id="couponPermissionBlock"></div>
-
-      <div class="form-card" id="couponFormContainer">
+      <div id="shopPermissionBlock" class="form-box">
         <h3>🛍 Выставить товар / купон в магазин</h3>
         <form id="createCouponForm">
           <div class="form-group">
             <label>Название товара или акции</label>
-            <input type="text" id="couponTitle" placeholder="Например: Скидка 20% на кофе" required>
+            <input type="text" id="couponTitle" placeholder="Например: Скидка 50% на кофе" required>
           </div>
           <div class="form-group">
             <label>Категория</label>
             <select id="couponCategory">
               <option value="Еда и напитки">Еда и напитки</option>
-              <option value="Скидки и покупки">Скидки и покупки</option>
-              <option value="Развлечения">Развлечения</option>
-              <option value="Сертификаты">Сертификаты</option>
+              <option value="Эко-товары">Эко-товары</option>
+              <option value="Услуги">Услуги</option>
             </select>
           </div>
           <div class="form-group">
+            <label>Промокод, ссылка на QR или инструкция для волонтёра</label>
+            <input type="text" id="couponCode" placeholder="Например: COFFEE50 или https://qr-link..." required>
+          </div>
+          <div class="form-group">
             <label>Стоимость в очках (XP)</label>
-            <input type="number" id="couponCost" placeholder="Например: 150" required min="1">
+            <input type="number" id="couponCost" placeholder="Например: 300" required>
           </div>
           <button type="submit" class="btn-submit">Опубликовать в магазине</button>
         </form>
       </div>
 
-      <h3>Выставленные купоны</h3>
-      <div class="quest-list" id="myCouponList">
-        <div class="empty-state">Загружаем товары…</div>
-      </div>
+      <h3 style="margin-top:24px;">Выставленные купоны</h3>
+      <div id="myCouponList">Загрузка...</div>
     </section>
 
-    <!-- ВКЛАДКА 3: ПРОФИЛЬ ПАРТНЕРА -->
+    <!-- ВКЛАДКА 3: ПРОФИЛЬ -->
     <section id="tab-profile" class="tab-content">
       <div class="app-topbar">
-        <div>
-          <h2>Профиль организации</h2>
-          <p style="margin:0;">Информация об аккаунте партнёра.</p>
+        <h2>Профиль Партнёра</h2>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar">P</div>
+        <div class="profile-info">
+          <h3 id="profileName">Загрузка...</h3>
+          <p id="profileEmail">email@example.com</p>
+          <span class="profile-badge">🤝 Партнёр Tera</span>
         </div>
       </div>
 
-      <div class="form-card">
-        <h3 id="profileOrgName">—</h3>
-        <p><strong>Email:</strong> <span id="profileOrgEmail">—</span></p>
-        <p><strong>Доступ к квестам:</strong> <span id="permQuestsBadge">—</span></p>
-        <p><strong>Доступ к купонам:</strong> <span id="permCouponsBadge">—</span></p>
+      <!-- Форма редактирования -->
+      <div class="form-box">
+        <h3>Редактировать профиль</h3>
+        <form id="editProfileForm">
+          <div class="form-group">
+            <label>Название компании / Организации</label>
+            <input type="text" id="editName" required>
+          </div>
+          <div class="form-group">
+            <label>Ссылка на логотип (URL) или Эмодзи</label>
+            <input type="text" id="editAvatar" placeholder="https://... или ☕">
+          </div>
+          <button type="submit" class="btn-submit">Сохранить изменения</button>
+        </form>
       </div>
     </section>
 
@@ -174,154 +183,141 @@
 </div>
 
 <script type="module">
-  import { requireAuth, logout, createQuest, loadPartnerQuests, createCoupon, loadPartnerCoupons } from "../js/app.js";
+  import { requireAuth, logout, createQuest, loadQuests, createCoupon, loadCoupons, updateUserProfile } from "../js/app.js";
 
-  // Табы
+  let currentPartner = null;
+
+  // Навигация
   const navLinks = document.querySelectorAll('.app-nav .nav-link');
   const tabContents = document.querySelectorAll('.tab-content');
-
   navLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetTab = link.getAttribute('data-tab');
-
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
-
-      tabContents.forEach(content => {
-        content.classList.remove('active');
-        if (content.id === `tab-${targetTab}`) {
-          content.classList.add('active');
-        }
+      tabContents.forEach(c => {
+        c.classList.remove('active');
+        if (c.id === `tab-${targetTab}`) c.classList.add('active');
       });
     });
   });
 
-  // Авторизация партнера
+  // Авторизация и проверка прав
   requireAuth("partner", async (profile) => {
-    document.querySelectorAll(".partner-name").forEach(el => el.textContent = profile.name);
-    document.getElementById("profileOrgName").textContent = profile.name;
-    document.getElementById("profileOrgEmail").textContent = profile.email || "Не указан";
+    currentPartner = profile;
 
-    const hasQuestPerm = profile.permissions?.quests ?? true;
-    const hasCouponPerm = profile.permissions?.coupons ?? true;
+    document.getElementById("partnerTitle").textContent = profile.name || "Кабинет партнёра";
+    document.getElementById("profileName").textContent = profile.name || "Партнёр";
+    document.getElementById("profileEmail").textContent = profile.email;
+    document.getElementById("editName").value = profile.name || "";
+    document.getElementById("editAvatar").value = profile.avatar || "";
 
-    document.getElementById("permQuestsBadge").textContent = hasQuestPerm ? "✅ Разрешено" : "❌ Запрещено";
-    document.getElementById("permCouponsBadge").textContent = hasCouponPerm ? "✅ Разрешено" : "❌ Запрещено";
-
-    // Проверка прав на квесты
-    if (!hasQuestPerm) {
-      document.getElementById("questFormContainer").style.display = "none";
-      document.getElementById("questPermissionBlock").innerHTML = `
-        <div class="permission-denied">У вашего аккаунта нет прав для публикации квестов.</div>
-      `;
+    // Аватарка
+    const avatarEl = document.getElementById("profileAvatar");
+    if (profile.avatar && profile.avatar.startsWith("http")) {
+      avatarEl.innerHTML = `<img src="${profile.avatar}" alt="avatar">`;
+    } else if (profile.avatar) {
+      avatarEl.textContent = profile.avatar;
+    } else {
+      avatarEl.textContent = (profile.name || "P").charAt(0);
     }
 
-    // Проверка прав на купоны
-    if (!hasCouponPerm) {
-      document.getElementById("couponFormContainer").style.display = "none";
-      document.getElementById("couponPermissionBlock").innerHTML = `
-        <div class="permission-denied">У вашего аккаунта нет прав для публикации товаров и купонов.</div>
-      `;
+    // Проверка прав permissions (квесты / купоны)
+    const canQuests = profile.permissions?.quests !== false;
+    const canCoupons = profile.permissions?.coupons !== false;
+
+    if (!canQuests) {
+      document.getElementById("questPermissionBlock").innerHTML = `<p style="color:#d32f2f;">⛔ У вашей организации нет прав на создание квестов.</p>`;
+    }
+    if (!canCoupons) {
+      document.getElementById("shopPermissionBlock").innerHTML = `<p style="color:#d32f2f;">⛔ У вашего аккаунта нет прав на добавление товаров в магазин.</p>`;
     }
 
-    // Загрузка квестов партнера
-    async function refreshQuests() {
-      const list = document.getElementById("myQuestList");
-      try {
-        const quests = await loadPartnerQuests(profile.uid);
-        if (quests.length === 0) {
-          list.innerHTML = `<div class="empty-state">Вы еще не создали ни одного квеста.</div>`;
-          return;
-        }
-        list.innerHTML = quests.map(q => `
-          <div class="ticket">
-            <div class="ticket-icon">🎯</div>
-            <div>
-              <div class="ticket-tag">${q.category.toUpperCase()}</div>
-              <div class="ticket-title">${q.title}</div>
-              <div class="ticket-reward">Награда: ${q.reward}</div>
-            </div>
-          </div>
-        `).join("");
-      } catch(e) {
-        console.error(e);
-        list.innerHTML = `<div class="empty-state">Ошибка загрузки квестов</div>`;
-      }
-    }
-
-    // Загрузка купонов партнера
-    async function refreshCoupons() {
-      const list = document.getElementById("myCouponList");
-      try {
-        const coupons = await loadPartnerCoupons(profile.uid);
-        if (coupons.length === 0) {
-          list.innerHTML = `<div class="empty-state">Вы еще не выставили товары в магазин.</div>`;
-          return;
-        }
-        list.innerHTML = coupons.map(c => `
-          <div class="ticket">
-            <div class="ticket-icon">🛍</div>
-            <div>
-              <div class="ticket-tag">${c.category.toUpperCase()}</div>
-              <div class="ticket-title">${c.title}</div>
-              <div class="ticket-reward">Цена: ${c.cost} XP</div>
-            </div>
-          </div>
-        `).join("");
-      } catch(e) {
-        console.error(e);
-        list.innerHTML = `<div class="empty-state">Ошибка загрузки товаров</div>`;
-      }
-    }
-
-    refreshQuests();
-    refreshCoupons();
-
-    // Обработка формы квеста
-    document.getElementById("createQuestForm")?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      try {
-        await createQuest({
-          title: document.getElementById("questTitle").value,
-          category: document.getElementById("questCategory").value,
-          reward: document.getElementById("questReward").value,
-          ownerUid: profile.uid,
-          ownerName: profile.name
-        });
-        e.target.reset();
-        refreshQuests();
-        alert("Квест успешно создан!");
-      } catch(e) {
-        alert("Ошибка создания квеста: " + e.message);
-      }
-    });
-
-    // Обработка формы купона
-    document.getElementById("createCouponForm")?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      try {
-        await createCoupon({
-          title: document.getElementById("couponTitle").value,
-          category: document.getElementById("couponCategory").value,
-          cost: document.getElementById("couponCost").value,
-          ownerUid: profile.uid,
-          ownerName: profile.name
-        });
-        e.target.reset();
-        refreshCoupons();
-        alert("Товар/купон успешно добавлен в магазин!");
-      } catch(e) {
-        alert("Ошибка добавления товара: " + e.message);
-      }
-    });
-
+    // Загрузка созданного контента
+    refreshContent();
   });
 
-  // Выход
+  async function refreshContent() {
+    // Квесты
+    const quests = await loadQuests(currentPartner.uid);
+    const myQuestList = document.getElementById("myQuestList");
+    if (quests.length === 0) {
+      myQuestList.innerHTML = `<p style="color:#888;">Вы ещё не публиковали квесты.</p>`;
+    } else {
+      myQuestList.innerHTML = quests.map(q => `
+        <div class="ticket">
+          <div class="ticket-icon">🎯</div>
+          <div>
+            <div class="ticket-title">${q.title}</div>
+            <div class="ticket-reward">Награда: ${q.reward} | Ссылка: <a href="${q.link}" target="_blank">Форма ↗</a></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // Купоны
+    const coupons = await loadCoupons(currentPartner.uid);
+    const myCouponList = document.getElementById("myCouponList");
+    if (coupons.length === 0) {
+      myCouponList.innerHTML = `<p style="color:#888;">Вы ещё не выставляли купоны.</p>`;
+    } else {
+      myCouponList.innerHTML = coupons.map(c => `
+        <div class="ticket">
+          <div class="ticket-icon">🎁</div>
+          <div>
+            <div class="ticket-title">${c.title} (${c.cost} XP)</div>
+            <div class="ticket-reward">Код/QR: <b>${c.code}</b></div>
+          </div>
+        </div>
+      `).join("");
+    }
+  }
+
+  // Создание квеста
+  document.getElementById("createQuestForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await createQuest({
+      title: document.getElementById("questTitle").value,
+      category: document.getElementById("questCategory").value,
+      link: document.getElementById("questLink").value,
+      reward: document.getElementById("questReward").value,
+      ownerName: currentPartner.name || "Партнёр"
+    });
+    alert("Квест успешно опубликован!");
+    location.reload();
+  });
+
+  // Создание купона
+  document.getElementById("createCouponForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await createCoupon({
+      title: document.getElementById("couponTitle").value,
+      category: document.getElementById("couponCategory").value,
+      code: document.getElementById("couponCode").value,
+      cost: document.getElementById("couponCost").value,
+      ownerName: currentPartner.name || "Партнёр"
+    });
+    alert("Купон успешно опубликован в магазине!");
+    location.reload();
+  });
+
+  // Сохранение профиля
+  document.getElementById("editProfileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await updateUserProfile(currentPartner.uid, {
+      name: document.getElementById("editName").value,
+      avatar: document.getElementById("editAvatar").value
+    });
+    location.reload();
+  });
+
+  // Выход с подтверждением
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
-    logout();
+    if (confirm("Вы уверены, что хотите выйти из аккаунта?")) {
+      logout();
+    }
   });
 </script>
 

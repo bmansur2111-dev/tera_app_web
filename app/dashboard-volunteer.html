@@ -21,6 +21,7 @@
 
   .xp-badge-top { background: #d8f3dc; color: #1b4332; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 16px; display: inline-flex; align-items: center; gap: 6px; }
 
+  /* Карточки */
   .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
   .card { background: white; border-radius: 16px; padding: 20px; border: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
   .card-category { font-size: 12px; color: #52b788; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; }
@@ -29,8 +30,8 @@
 
   .btn-action { background: #1b4332; color: white; border: none; padding: 10px 16px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: bold; cursor: pointer; transition: 0.2s; display: block; width: 100%; box-sizing: border-box; }
   .btn-action:hover { background: #2d6a4f; }
-  .btn-action:disabled { background: #ccc; cursor: not-allowed; }
 
+  /* Профиль */
   .profile-card { display: flex; align-items: center; gap: 20px; background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 24px; }
   .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: #1b4332; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; overflow: hidden; }
   .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -50,7 +51,8 @@
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
     <nav class="app-nav">
-      <a class="nav-link active" data-tab="quests">🎯 Доступные квесты</a>
+      <a class="nav-link active" data-tab="home">🏠 Главная</a>
+      <a class="nav-link" data-tab="quests">🎯 Доступные квесты</a>
       <a class="nav-link" data-tab="shop">🛍 Магазин наград</a>
       <a class="nav-link" data-tab="chat">💬 Чаты волонтёров</a>
       <a class="nav-link" data-tab="profile">👤 Профиль и купоны</a>
@@ -60,8 +62,57 @@
 
   <main class="app-main">
 
+    <!-- ВКЛАДКА 0: ГЛАВНАЯ (ОТКРЫВАЕТСЯ ПРИ ВХОДЕ) -->
+    <section id="tab-home" class="tab-content active">
+      <!-- Баннер приветствия -->
+      <div style="background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%); color: white; padding: 32px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(27, 67, 50, 0.15);">
+        <h1 style="margin: 0 0 10px 0; font-size: 30px;">С возвращением, <span id="homeUserName">Волонтёр</span>! 👋</h1>
+        <p style="margin: 0; opacity: 0.9; font-size: 16px; line-height: 1.5;">
+          Спасибо, что делаешь наш город чище и зеленее. Выбирай новые эко-квесты, зарабатывай XP и обменивай их на реальные бонусы!
+        </p>
+      </div>
+
+      <!-- Карточки статистики -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div class="card" style="border-left: 5px solid #52b788;">
+          <div style="font-size: 12px; color: #666; font-weight: bold; text-transform: uppercase;">Мой баланс</div>
+          <div style="font-size: 32px; font-weight: bold; color: #1b4332; margin-top: 6px;">⚡ <span class="userXPVal">0</span> <span style="font-size:16px; font-weight:normal;">XP</span></div>
+        </div>
+        <div class="card" style="border-left: 5px solid #2d6a4f;">
+          <div style="font-size: 12px; color: #666; font-weight: bold; text-transform: uppercase;">Доступно квестов</div>
+          <div style="font-size: 32px; font-weight: bold; color: #1b4332; margin-top: 6px;" id="homeQuestsCount">0</div>
+        </div>
+        <div class="card" style="border-left: 5px solid #b7e4c7;">
+          <div style="font-size: 12px; color: #666; font-weight: bold; text-transform: uppercase;">Куплено купонов</div>
+          <div style="font-size: 32px; font-weight: bold; color: #1b4332; margin-top: 6px;" id="homeCouponsCount">0</div>
+        </div>
+      </div>
+
+      <!-- Быстрый доступ и Эко-Совет -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="card" style="background: #e8f5e9; border: 1px solid #c8e6c9;">
+          <div>
+            <h3 style="margin-top: 0; color: #1b4332;">🌱 Эко-факт дня</h3>
+            <p style="color: #2e7d32; line-height: 1.5; font-size: 15px; margin-bottom: 0;">
+              Переработка одной тонны бумаги спасает около 17 деревьев, 26 000 литров воды и предотвращает выброс вредного углекислого газа!
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div>
+            <h3 style="margin-top: 0; color: #1b4332;">🚀 Готов к действию?</h3>
+            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+              Запишись на субботник или высадку деревьев прямо сейчас, чтобы получить свои первые очки XP.
+            </p>
+          </div>
+          <button class="btn-action" id="btnGoToQuests">Перейти к квестам ↗</button>
+        </div>
+      </div>
+    </section>
+
     <!-- ВКЛАДКА 1: КВЕСТЫ -->
-    <section id="tab-quests" class="tab-content active">
+    <section id="tab-quests" class="tab-content">
       <div class="app-topbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
         <h2 style="margin:0; color:#1b4332;">Экологические квесты</h2>
         <div class="xp-badge-top">⚡ <span class="userXPVal">0</span> XP</div>
@@ -179,6 +230,11 @@
     });
   });
 
+  // Переход к квестам с кнопки на главной
+  document.getElementById("btnGoToQuests").addEventListener("click", () => {
+    document.querySelector('.nav-link[data-tab="quests"]').click();
+  });
+
   // Авторизация
   requireAuth("volunteer", async (profile) => {
     currentVolunteer = profile;
@@ -187,10 +243,13 @@
   });
 
   function updateUIProfile() {
+    // Устанавливаем реальный баланс XP (по умолчанию 0)
     const xp = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 0;
     document.querySelectorAll(".userXPVal").forEach(el => el.textContent = xp);
 
-    document.getElementById("profileName").textContent = currentVolunteer.name || "Волонтёр";
+    const userName = currentVolunteer.name || "Волонтёр";
+    document.getElementById("homeUserName").textContent = userName;
+    document.getElementById("profileName").textContent = userName;
     document.getElementById("profileEmail").textContent = currentVolunteer.email;
     document.getElementById("editName").value = currentVolunteer.name || "";
     document.getElementById("editAvatar").value = currentVolunteer.avatar || "";
@@ -201,12 +260,14 @@
     } else if (currentVolunteer.avatar) {
       avatarEl.textContent = currentVolunteer.avatar;
     } else {
-      avatarEl.textContent = (currentVolunteer.name || "V").charAt(0);
+      avatarEl.textContent = userName.charAt(0);
     }
 
     // Отображение купленных купонов
     const purchasedList = document.getElementById("purchasedCouponsList");
     const coupons = currentVolunteer.purchasedCoupons || [];
+    document.getElementById("homeCouponsCount").textContent = coupons.length;
+
     if (coupons.length === 0) {
       purchasedList.innerHTML = `<p style="color:#888;">Вы ещё не покупали купоны.</p>`;
     } else {
@@ -224,14 +285,16 @@
     // --- 1. КВЕСТЫ ---
     try {
       const quests = await loadQuests();
+      document.getElementById("homeQuestsCount").textContent = quests.length;
+
       const questsContainer = document.getElementById("questsContainer");
       if (quests.length === 0) {
         questsContainer.innerHTML = `<p style="color:#888;">Пока нет доступных квестов.</p>`;
       } else {
         questsContainer.innerHTML = quests.map(q => {
           const spotsInfo = q.maxVolunteers 
-          ? `👥 Максимальное кол-во мест: <b>${q.maxVolunteers} чел.</b>` 
-          : `👥 Лимит участников: <b>Без ограничений</b>`;
+            ? `👥 Максимальное кол-во мест: <b>${q.maxVolunteers} чел.</b>` 
+            : `👥 Лимит участников: <b>Без ограничений</b>`;
 
           return `
             <div class="card">
@@ -244,12 +307,15 @@
                   ${spotsInfo}
                 </div>
               </div>
-              <button class="btn-action btn-register-quest" data-id="${q.id}" data-link="${q.link}">
+              <button 
+                class="btn-action btn-register-quest" 
+                data-id="${q.id}" 
+                data-link="${q.link}">
                 Перейти к форме записи ↗
               </button>
             </div>
           `;
-        }).join("");  
+        }).join("");
 
         // Обработчик клика "Записаться на квест"
         document.querySelectorAll(".btn-register-quest").forEach(btn => {
@@ -303,7 +369,7 @@
           let isDisabled = false;
 
           if (isSoldOut) {
-            btnText = "Рас распродано";
+            btnText = "Распродано";
             isDisabled = true;
           } else if (!canAfford) {
             btnText = `Не хватает XP (${c.cost} XP)`;

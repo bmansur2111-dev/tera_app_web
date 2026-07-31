@@ -52,6 +52,7 @@
     <nav class="app-nav">
       <a class="nav-link active" data-tab="quests">🎯 Доступные квесты</a>
       <a class="nav-link" data-tab="shop">🛍 Магазин наград</a>
+      <a class="nav-link" data-tab="chat">💬 Чаты волонтёров</a>
       <a class="nav-link" data-tab="profile">👤 Профиль и купоны</a>
       <a href="#" id="logoutBtn" style="margin-top: auto; color: #ff8585;">🚪 Выйти</a>
     </nav>
@@ -61,7 +62,7 @@
 
     <!-- ВКЛАДКА 1: КВЕСТЫ -->
     <section id="tab-quests" class="tab-content active">
-      <div class="app-topbar" style="display:flex; justify-shadow:space-between; align-items:center; margin-bottom:24px;">
+      <div class="app-topbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
         <h2 style="margin:0; color:#1b4332;">Экологические квесты</h2>
         <div class="xp-badge-top">⚡ <span class="userXPVal">0</span> XP</div>
       </div>
@@ -79,7 +80,36 @@
       <div id="shopContainer" class="card-grid">Загрузка...</div>
     </section>
 
-    <!-- ВКЛАДКА 3: ПРОФИЛЬ -->
+    <!-- ВКЛАДКА 3: ЧАТЫ -->
+    <section id="tab-chat" class="tab-content">
+      <div class="app-topbar">
+        <h2 style="color:#1b4332;">Сообщество и чаты квестов</h2>
+      </div>
+
+      <div class="form-box">
+        <h3>➕ Создать чат / добавить группу</h3>
+        <form id="createChatForm">
+          <div class="form-group">
+            <label>Название чата / квеста</label>
+            <input type="text" id="chatTitle" placeholder="Например: Чат квеста Высадка деревьев" required>
+          </div>
+          <div class="form-group">
+            <label>Ссылка на чат (Telegram, WhatsApp, VK)</label>
+            <input type="url" id="chatLink" placeholder="https://t.me/joinchat/..." required>
+          </div>
+          <div class="form-group">
+            <label>Описание или цель группы</label>
+            <input type="text" id="chatDesc" placeholder="Например: Координация волонтеров по высадке деревьев в парке" required>
+          </div>
+          <button type="submit" class="btn-action" style="width:auto;">Опубликовать чат</button>
+        </form>
+      </div>
+
+      <h3>Доступные чаты</h3>
+      <div id="chatsContainer" class="card-grid">Загрузка...</div>
+    </section>
+
+    <!-- ВКЛАДКА 4: ПРОФИЛЬ -->
     <section id="tab-profile" class="tab-content">
       <div class="app-topbar">
         <h2 style="color:#1b4332;">Мой профиль</h2>
@@ -119,7 +149,17 @@
 </div>
 
 <script type="module">
-  import { requireAuth, logout, loadQuests, loadCoupons, buyCoupon, updateUserProfile } from "../js/app.js";
+  import { 
+    requireAuth, 
+    logout, 
+    loadQuests, 
+    registerForQuest, 
+    loadCoupons, 
+    buyCoupon, 
+    updateUserProfile, 
+    createChatGroup, 
+    loadChatGroups 
+  } from "../js/app.js";
 
   let currentVolunteer = null;
 
@@ -181,113 +221,195 @@
   }
 
   async function refreshData() {
-    // Загрузка квестов
-    const quests = await loadQuests();
-    const questsContainer = document.getElementById("questsContainer");
-    if (quests.length === 0) {
-      questsContainer.innerHTML = `<p style="color:#888;">Пока нет доступных квестов.</p>`;
-    } else {
-      questsContainer.innerHTML = quests.map(q => {
-        let spotsInfo = "";
-        if (!q.maxVolunteers) {
-          spotsInfo = "👥 Мест: Без ограничений";
-        } else {
-          const left = q.maxVolunteers - (q.registeredCount || 0);
-          spotsInfo = left > 0 ? `👥 Осталось мест: <b>${left} из ${q.maxVolunteers}</b>` : `<span style="color:red; font-weight:bold;">❌ Все места заняты</span>`;
-        }
+    // --- 1. КВЕСТЫ ---
+    try {
+      const quests = await loadQuests();
+      const questsContainer = document.getElementById("questsContainer");
+      if (quests.length === 0) {
+        questsContainer.innerHTML = `<p style="color:#888;">Пока нет доступных квестов.</p>`;
+      } else {
+        questsContainer.innerHTML = quests.map(q => {
+          const registered = q.registeredCount || 0;
+          let spotsInfo = "";
+          let isFull = false;
 
-        return `
-          <div class="card">
-            <div>
-              <div class="card-category">${q.category || "Квест"}</div>
-              <div class="card-title">${q.title}</div>
-              <div class="card-info">
-                От: <b>${q.ownerName || "Организация"}</b><br>
-                Награда: <b>${q.reward}</b><br>
-                ${spotsInfo}
-              </div>
-            </div>
-            <a href="${q.link}" target="_blank" class="btn-action">Записаться на квест ↗</a>
-          </div>
-        `;
-      }).join("");
-    }
-
-    // Загрузка купонов в магазин
-    const coupons = await loadCoupons();
-    const shopContainer = document.getElementById("shopContainer");
-    const userXP = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 500;
-
-    if (coupons.length === 0) {
-      shopContainer.innerHTML = `<p style="color:#888;">В магазине пока нет товаров.</p>`;
-    } else {
-      shopContainer.innerHTML = coupons.map(c => {
-        const claimed = c.claimedCount || 0;
-        let isSoldOut = false;
-        let stockInfo = "";
-
-        if (!c.maxQuantity) {
-          stockInfo = "📦 В наличии: Много";
-        } else {
-          const remaining = c.maxQuantity - claimed;
-          if (remaining <= 0) {
-            isSoldOut = true;
-            stockInfo = "<b style='color:red;'>Закончились</b>";
+          if (!q.maxVolunteers) {
+            spotsInfo = "👥 Мест: Без ограничений";
           } else {
-            stockInfo = `📦 Осталось: <b>${remaining} из ${c.maxQuantity} шт.</b>`;
-          }
-        }
-
-        const canAfford = userXP >= c.cost;
-        let btnText = `Получить за ${c.cost} XP`;
-        let isDisabled = false;
-
-        if (isSoldOut) {
-          btnText = "Распродано";
-          isDisabled = true;
-        } else if (!canAfford) {
-          btnText = `Не хватает XP (${c.cost} XP)`;
-          isDisabled = true;
-        }
-
-        return `
-          <div class="card">
-            <div>
-              <div class="card-category">${c.category || "Купон"}</div>
-              <div class="card-title">${c.title}</div>
-              <div class="card-info">
-                Партнёр: <b>${c.ownerName || "Кофейня/Магазин"}</b><br>
-                ${stockInfo}
-              </div>
-            </div>
-            <button class="btn-action btn-buy" data-id="${c.id}" ${isDisabled ? "disabled" : ""}>${btnText}</button>
-          </div>
-        `;
-      }).join("");
-
-      // Навешивание событий на кнопки покупки
-      document.querySelectorAll(".btn-buy").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const couponId = btn.getAttribute("data-id");
-          const selectedCoupon = coupons.find(item => item.id === couponId);
-          if (selectedCoupon && confirm(`Обменять ${selectedCoupon.cost} XP на "${selectedCoupon.title}"?`)) {
-            const success = await buyCoupon(currentVolunteer, selectedCoupon);
-            if (success) {
-              currentVolunteer.xp -= selectedCoupon.cost;
-              if (!currentVolunteer.purchasedCoupons) currentVolunteer.purchasedCoupons = [];
-              currentVolunteer.purchasedCoupons.push({
-                title: selectedCoupon.title,
-                code: selectedCoupon.code,
-                boughtAt: new Date().toLocaleString()
-              });
-              updateUIProfile();
-              refreshData();
+            const left = q.maxVolunteers - registered;
+            if (left <= 0) {
+              isFull = true;
+              spotsInfo = `<span style="color:red; font-weight:bold;">❌ Мест нет (${registered} из ${q.maxVolunteers})</span>`;
+            } else {
+              spotsInfo = `👥 Осталось мест: <b>${left} из ${q.maxVolunteers}</b>`;
             }
           }
+
+          return `
+            <div class="card">
+              <div>
+                <div class="card-category">${q.category || "Квест"}</div>
+                <div class="card-title">${q.title}</div>
+                <div class="card-info">
+                  От: <b>${q.ownerName || "Организация"}</b><br>
+                  Награда: <b>${q.reward}</b><br>
+                  ${spotsInfo}
+                </div>
+              </div>
+              <button 
+                class="btn-action btn-register-quest" 
+                data-id="${q.id}" 
+                data-link="${q.link}" 
+                ${isFull ? "disabled" : ""}>
+                ${isFull ? "Места закончились" : "Записаться на квест ↗"}
+              </button>
+            </div>
+          `;
+        }).join("");
+
+        // Обработчик клика "Записаться на квест"
+        document.querySelectorAll(".btn-register-quest").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const questId = btn.getAttribute("data-id");
+            const link = btn.getAttribute("data-link");
+
+            try {
+              await registerForQuest(questId);
+              window.open(link, "_blank");
+              refreshData();
+            } catch (e) {
+              console.error("Ошибка при записи:", e);
+              window.open(link, "_blank");
+            }
+          });
         });
-      });
+      }
+    } catch (e) {
+      console.error("Ошибка загрузки квестов:", e);
+    }
+
+    // --- 2. МАГАЗИН КУПОНОВ ---
+    try {
+      const coupons = await loadCoupons();
+      const shopContainer = document.getElementById("shopContainer");
+      const userXP = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 500;
+
+      if (coupons.length === 0) {
+        shopContainer.innerHTML = `<p style="color:#888;">В магазине пока нет товаров.</p>`;
+      } else {
+        shopContainer.innerHTML = coupons.map(c => {
+          const claimed = c.claimedCount || 0;
+          let isSoldOut = false;
+          let stockInfo = "";
+
+          if (!c.maxQuantity) {
+            stockInfo = "📦 В наличии: Много";
+          } else {
+            const remaining = c.maxQuantity - claimed;
+            if (remaining <= 0) {
+              isSoldOut = true;
+              stockInfo = "<b style='color:red;'>Закончились</b>";
+            } else {
+              stockInfo = `📦 Осталось: <b>${remaining} из ${c.maxQuantity} шт.</b>`;
+            }
+          }
+
+          const canAfford = userXP >= c.cost;
+          let btnText = `Получить за ${c.cost} XP`;
+          let isDisabled = false;
+
+          if (isSoldOut) {
+            btnText = "Рас распродано";
+            isDisabled = true;
+          } else if (!canAfford) {
+            btnText = `Не хватает XP (${c.cost} XP)`;
+            isDisabled = true;
+          }
+
+          return `
+            <div class="card">
+              <div>
+                <div class="card-category">${c.category || "Купон"}</div>
+                <div class="card-title">${c.title}</div>
+                <div class="card-info">
+                  Партнёр: <b>${c.ownerName || "Кофейня/Магазин"}</b><br>
+                  ${stockInfo}
+                </div>
+              </div>
+              <button class="btn-action btn-buy" data-id="${c.id}" ${isDisabled ? "disabled" : ""}>${btnText}</button>
+            </div>
+          `;
+        }).join("");
+
+        // Кнопки покупки
+        document.querySelectorAll(".btn-buy").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const couponId = btn.getAttribute("data-id");
+            const selectedCoupon = coupons.find(item => item.id === couponId);
+            if (selectedCoupon && confirm(`Обменять ${selectedCoupon.cost} XP на "${selectedCoupon.title}"?`)) {
+              const success = await buyCoupon(currentVolunteer, selectedCoupon);
+              if (success) {
+                currentVolunteer.xp -= selectedCoupon.cost;
+                if (!currentVolunteer.purchasedCoupons) currentVolunteer.purchasedCoupons = [];
+                currentVolunteer.purchasedCoupons.push({
+                  title: selectedCoupon.title,
+                  code: selectedCoupon.code,
+                  boughtAt: new Date().toLocaleString()
+                });
+                updateUIProfile();
+                refreshData();
+              }
+            }
+          });
+        });
+      }
+    } catch (e) {
+      console.error("Ошибка загрузки магазина:", e);
+    }
+
+    // --- 3. ЧАТЫ ---
+    try {
+      const chats = await loadChatGroups();
+      const chatsContainer = document.getElementById("chatsContainer");
+      if (chats.length === 0) {
+        chatsContainer.innerHTML = `<p style="color:#888;">Пока нет созданных чатов.</p>`;
+      } else {
+        chatsContainer.innerHTML = chats.map(c => `
+          <div class="card">
+            <div>
+              <div class="card-category">💬 Группа волонтёров</div>
+              <div class="card-title">${c.title}</div>
+              <div class="card-info">
+                ${c.description}<br>
+                <small style="color:#888;">Создал: ${c.ownerName}</small>
+              </div>
+            </div>
+            <a href="${c.link}" target="_blank" class="btn-action" style="background:#25D366; text-align:center;">Войти в чат ↗</a>
+          </div>
+        `).join("");
+      }
+    } catch (e) {
+      console.error("Ошибка загрузки чатов:", e);
     }
   }
+
+  // Создание нового чата
+  document.getElementById("createChatForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      await createChatGroup({
+        title: document.getElementById("chatTitle").value,
+        link: document.getElementById("chatLink").value,
+        description: document.getElementById("chatDesc").value,
+        ownerName: currentVolunteer.name || "Волонтёр"
+      });
+      alert("Чат успешно опубликован!");
+      document.getElementById("createChatForm").reset();
+      refreshData();
+    } catch (err) {
+      alert("Ошибка при создании чата: " + err.message);
+    }
+  });
 
   // Обновление профиля
   document.getElementById("editProfileForm").addEventListener("submit", async (e) => {

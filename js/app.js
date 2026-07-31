@@ -11,7 +11,8 @@ import {
   query, 
   where, 
   arrayUnion, 
-  deleteDoc 
+  deleteDoc,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = window.firebaseConfig || {
@@ -180,4 +181,31 @@ export async function updateUserProfile(uid, data) {
   const userRef = doc(db, "users", uid);
   await updateDoc(userRef, data);
   alert("Профиль успешно обновлён!");
+}
+
+// --- РЕГИСТРАЦИЯ НА КВЕСТ (Увеличиваем счетчик) ---
+export async function registerForQuest(questId) {
+  const questRef = doc(db, "quests", questId);
+  await updateDoc(questRef, {
+    registeredCount: increment(1)
+  });
+}
+
+// --- СОЗДАНИЕ И ЗАГРУЗКА ЧАТОВ ---
+export async function createChatGroup(chatData) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Не авторизован");
+
+  return await addDoc(collection(db, "chats"), {
+    ...chatData,
+    ownerId: user.uid,
+    ownerName: chatData.ownerName || "Волонтёр",
+    createdAt: new Date().toISOString()
+  });
+}
+
+export async function loadChatGroups() {
+  const q = query(collection(db, "chats"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }

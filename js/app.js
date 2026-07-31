@@ -1,16 +1,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, getDocs, query, where, orderBy, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, getDocs, query, where, arrayUnion, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Ваша конфигурация Firebase (автоматически подтягивается из firebase-config.js если вы вынесли, либо вставьте свой объект):
 const firebaseConfig = window.firebaseConfig || {
-  apiKey: "AIzaSyBqEJD4eyR9_z_h2X_XkpGUYc8wOV6h5Og",
-  authDomain: "tera-eco-app.firebaseapp.com",
-  projectId: "tera-eco-app",
-  storageBucket: "tera-eco-app.firebasestorage.app",
-  messagingSenderId: "128530104831",
-  appId: "1:128530104831:web:058edd0853cb7c701827ca",
-  measurementId: "G-KMS58TKF87"
+  apiKey: "AIzaSyBqEJD4eyR9_z_h2X_XkpGUYc8wOV6h5Og",
+  authDomain: "tera-eco-app.firebaseapp.com",
+  projectId: "tera-eco-app",
+  storageBucket: "tera-eco-app.firebasestorage.app",
+  messagingSenderId: "128530104831",
+  appId: "1:128530104831:web:058edd0853cb7c701827ca",
+  measurementId: "G-KMS58TKF87"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -80,6 +79,10 @@ export async function loadQuests(ownerId = null) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
+export async function deleteQuest(questId) {
+  await deleteDoc(doc(db, "quests", questId));
+}
+
 // --- КУПОНЫ И МАГАЗИН ---
 export async function createCoupon(couponData) {
   const user = auth.currentUser;
@@ -104,9 +107,13 @@ export async function loadCoupons(ownerId = null) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-// Покупка купона волонтером
+export async function deleteCoupon(couponId) {
+  await deleteDoc(doc(db, "coupons", couponId));
+}
+
+// Покупка купона волонтёром
 export async function buyCoupon(userProfile, coupon) {
-  const currentXP = userProfile.xp !== undefined ? userProfile.xp : 500; // по умолчанию 500 XP для тестов
+  const currentXP = userProfile.xp !== undefined ? userProfile.xp : 500;
 
   if (currentXP < coupon.cost) {
     alert(`Недостаточно XP! У вас: ${currentXP} XP, а стоимость купона: ${coupon.cost} XP.`);
@@ -119,7 +126,7 @@ export async function buyCoupon(userProfile, coupon) {
   const purchasedItem = {
     couponId: coupon.id,
     title: coupon.title,
-    code: coupon.code || "ПРОМОКОД: TERA-50-SPECIAL",
+    code: coupon.code || "ПРОМОКОД: TERA-SPECIAL",
     boughtAt: new Date().toLocaleString()
   };
 
@@ -128,11 +135,11 @@ export async function buyCoupon(userProfile, coupon) {
     purchasedCoupons: arrayUnion(purchasedItem)
   });
 
-  alert(`🎉 Успешно! Вы приобрели купон "${coupon.title}". Промокод/QR доступен в вашем профиле!`);
+  alert(`🎉 Успешно! Вы приобрели купон "${coupon.title}". Промокод доступен в вашем профиле!`);
   return true;
 }
 
-// --- РЕДАКТИРОВАНИЕ ПРОФИЛЯ ---
+// Редактирование профиля
 export async function updateUserProfile(uid, data) {
   const userRef = doc(db, "users", uid);
   await updateDoc(userRef, data);

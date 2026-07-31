@@ -56,6 +56,18 @@
     font-weight: bold;
   }
   .btn-submit:hover { background: #2d6a4f; }
+
+  .btn-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  .btn-delete:hover { background: #bd2130; }
 </style>
 </head>
 <body>
@@ -162,7 +174,6 @@
         </div>
       </div>
 
-      <!-- Форма редактирования -->
       <div class="form-box">
         <h3>Редактировать профиль</h3>
         <form id="editProfileForm">
@@ -183,7 +194,7 @@
 </div>
 
 <script type="module">
-  import { requireAuth, logout, createQuest, loadQuests, createCoupon, loadCoupons, updateUserProfile } from "../js/app.js";
+  import { requireAuth, logout, createQuest, loadQuests, deleteQuest, createCoupon, loadCoupons, deleteCoupon, updateUserProfile } from "../js/app.js";
 
   let currentPartner = null;
 
@@ -203,7 +214,7 @@
     });
   });
 
-  // Авторизация и проверка прав
+  // Авторизация
   requireAuth("partner", async (profile) => {
     currentPartner = profile;
 
@@ -213,7 +224,6 @@
     document.getElementById("editName").value = profile.name || "";
     document.getElementById("editAvatar").value = profile.avatar || "";
 
-    // Аватарка
     const avatarEl = document.getElementById("profileAvatar");
     if (profile.avatar && profile.avatar.startsWith("http")) {
       avatarEl.innerHTML = `<img src="${profile.avatar}" alt="avatar">`;
@@ -223,7 +233,6 @@
       avatarEl.textContent = (profile.name || "P").charAt(0);
     }
 
-    // Проверка прав permissions (квесты / купоны)
     const canQuests = profile.permissions?.quests !== false;
     const canCoupons = profile.permissions?.coupons !== false;
 
@@ -234,44 +243,69 @@
       document.getElementById("shopPermissionBlock").innerHTML = `<p style="color:#d32f2f;">⛔ У вашего аккаунта нет прав на добавление товаров в магазин.</p>`;
     }
 
-    // Загрузка созданного контента
     refreshContent();
   });
 
   async function refreshContent() {
-    // Квесты
+    // Список квестов с кнопкой "Удалить"
     const quests = await loadQuests(currentPartner.uid);
     const myQuestList = document.getElementById("myQuestList");
     if (quests.length === 0) {
       myQuestList.innerHTML = `<p style="color:#888;">Вы ещё не публиковали квесты.</p>`;
     } else {
       myQuestList.innerHTML = quests.map(q => `
-        <div class="ticket">
-          <div class="ticket-icon">🎯</div>
-          <div>
-            <div class="ticket-title">${q.title}</div>
-            <div class="ticket-reward">Награда: ${q.reward} | Ссылка: <a href="${q.link}" target="_blank">Форма ↗</a></div>
+        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="ticket-icon">🎯</div>
+            <div>
+              <div class="ticket-title">${q.title}</div>
+              <div class="ticket-reward">Награда: ${q.reward} | Ссылка: <a href="${q.link}" target="_blank">Форма ↗</a></div>
+            </div>
           </div>
+          <button class="btn-delete btn-delete-quest" data-id="${q.id}">Удалить</button>
         </div>
       `).join("");
     }
 
-    // Купоны
+    // Список купонов с кнопкой "Удалить"
     const coupons = await loadCoupons(currentPartner.uid);
     const myCouponList = document.getElementById("myCouponList");
     if (coupons.length === 0) {
       myCouponList.innerHTML = `<p style="color:#888;">Вы ещё не выставляли купоны.</p>`;
     } else {
       myCouponList.innerHTML = coupons.map(c => `
-        <div class="ticket">
-          <div class="ticket-icon">🎁</div>
-          <div>
-            <div class="ticket-title">${c.title} (${c.cost} XP)</div>
-            <div class="ticket-reward">Код/QR: <b>${c.code}</b></div>
+        <div class="ticket" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="ticket-icon">🎁</div>
+            <div>
+              <div class="ticket-title">${c.title} (${c.cost} XP)</div>
+              <div class="ticket-reward">Код/QR: <b>${c.code}</b></div>
+            </div>
           </div>
+          <button class="btn-delete btn-delete-coupon" data-id="${c.id}">Удалить</button>
         </div>
       `).join("");
     }
+
+    // Слушатели на кнопки удаления квестов
+    document.querySelectorAll(".btn-delete-quest").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (confirm("Вы уверены, что хотите удалить этот квест?")) {
+          await deleteQuest(btn.getAttribute("data-id"));
+          refreshContent();
+        }
+      });
+    });
+
+    // Слушатели на кнопки удаления купонов
+    document.querySelectorAll(".btn-delete-coupon").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (confirm("Вы уверены, что хотите удалить этот купон?")) {
+          await deleteCoupon(btn.getAttribute("data-id"));
+          refreshContent();
+        }
+      });
+    });
   }
 
   // Создание квеста
@@ -285,7 +319,8 @@
       ownerName: currentPartner.name || "Партнёр"
     });
     alert("Квест успешно опубликован!");
-    location.reload();
+    document.getElementById("createQuestForm").reset();
+    refreshContent();
   });
 
   // Создание купона
@@ -299,10 +334,11 @@
       ownerName: currentPartner.name || "Партнёр"
     });
     alert("Купон успешно опубликован в магазине!");
-    location.reload();
+    document.getElementById("createCouponForm").reset();
+    refreshContent();
   });
 
-  // Сохранение профиля
+  // Редактирование профиля
   document.getElementById("editProfileForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     await updateUserProfile(currentPartner.uid, {
@@ -312,7 +348,7 @@
     location.reload();
   });
 
-  // Выход с подтверждением
+  // Выход
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
     if (confirm("Вы уверены, что хотите выйти из аккаунта?")) {

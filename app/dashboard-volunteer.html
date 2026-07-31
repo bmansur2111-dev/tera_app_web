@@ -276,7 +276,7 @@
     try {
       const coupons = await loadCoupons();
       const shopContainer = document.getElementById("shopContainer");
-      const userXP = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 500;
+      const userXP = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 0;
 
       if (coupons.length === 0) {
         shopContainer.innerHTML = `<p style="color:#888;">В магазине пока нет товаров.</p>`;

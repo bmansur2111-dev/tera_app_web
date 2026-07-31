@@ -229,21 +229,9 @@
         questsContainer.innerHTML = `<p style="color:#888;">Пока нет доступных квестов.</p>`;
       } else {
         questsContainer.innerHTML = quests.map(q => {
-          const registered = q.registeredCount || 0;
-          let spotsInfo = "";
-          let isFull = false;
-
-          if (!q.maxVolunteers) {
-            spotsInfo = "👥 Мест: Без ограничений";
-          } else {
-            const left = q.maxVolunteers - registered;
-            if (left <= 0) {
-              isFull = true;
-              spotsInfo = `<span style="color:red; font-weight:bold;">❌ Мест нет (${registered} из ${q.maxVolunteers})</span>`;
-            } else {
-              spotsInfo = `👥 Осталось мест: <b>${left} из ${q.maxVolunteers}</b>`;
-            }
-          }
+          const spotsInfo = q.maxVolunteers 
+          ? `👥 Максимальное кол-во мест: <b>${q.maxVolunteers} чел.</b>` 
+          : `👥 Лимит участников: <b>Без ограничений</b>`;
 
           return `
             <div class="card">
@@ -256,16 +244,12 @@
                   ${spotsInfo}
                 </div>
               </div>
-              <button 
-                class="btn-action btn-register-quest" 
-                data-id="${q.id}" 
-                data-link="${q.link}" 
-                ${isFull ? "disabled" : ""}>
-                ${isFull ? "Места закончились" : "Записаться на квест ↗"}
+              <button class="btn-action btn-register-quest" data-id="${q.id}" data-link="${q.link}">
+                Перейти к форме записи ↗
               </button>
             </div>
           `;
-        }).join("");
+        }).join("");  
 
         // Обработчик клика "Записаться на квест"
         document.querySelectorAll(".btn-register-quest").forEach(btn => {

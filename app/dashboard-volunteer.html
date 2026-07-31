@@ -187,7 +187,7 @@
   });
 
   function updateUIProfile() {
-    const xp = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 500;
+    const xp = currentVolunteer.xp !== undefined ? currentVolunteer.xp : 0;
     document.querySelectorAll(".userXPVal").forEach(el => el.textContent = xp);
 
     document.getElementById("profileName").textContent = currentVolunteer.name || "Волонтёр";

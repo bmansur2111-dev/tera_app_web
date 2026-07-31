@@ -122,23 +122,8 @@
         </div>
       </div>
 
-      <div class="shop-grid">
-        <div class="ticket">
-          <div class="ticket-icon">☕</div>
-          <div>
-            <div class="ticket-tag">ЕДА И НАПИТКИ · Skurator Coffee</div>
-            <div class="ticket-title">Бесплатный кофе на выбор</div>
-            <div class="ticket-reward">Стоимость: 150 XP</div>
-          </div>
-        </div>
-        <div class="ticket">
-          <div class="ticket-icon">🍕</div>
-          <div>
-            <div class="ticket-tag">ЕДА И НАПИТКИ · CoffeeBoom</div>
-            <div class="ticket-title">Скидка 20% на десерты</div>
-            <div class="ticket-reward">Стоимость: 200 XP</div>
-          </div>
-        </div>
+      <div class="shop-grid" id="shopList">
+        <div class="empty-state">Загружаем награды и купоны…</div>
       </div>
     </section>
 
@@ -223,7 +208,7 @@
 </div>
 
 <script type="module">
-  import { requireAuth, logout, loadQuests } from "../js/app.js";
+  import { requireAuth, logout, loadQuests, loadCoupons } from "../js/app.js";
 
   // Переключение вкладок
   const navLinks = document.querySelectorAll('.app-nav .nav-link');
@@ -246,12 +231,11 @@
     });
   });
 
-  // Авторизация и вывод данных в профиль
+  // Авторизация и загрузка данных
   requireAuth("volunteer", async (profile) => {
     const userName = profile.name || "Волонтёр";
     const userEmail = profile.email || "Пользователь";
 
-    // Обновляем приветствие и карточку профиля
     document.querySelectorAll(".user-greeting").forEach(el => {
       el.textContent = `Привет, ${userName}!`;
     });
@@ -260,30 +244,52 @@
     document.getElementById("profileEmail").textContent = userEmail;
     document.getElementById("profileAvatar").textContent = userName.charAt(0);
 
-    // Загружаем квесты
-    const list = document.getElementById("questList");
+    // 1. Загрузка квестов
+    const questList = document.getElementById("questList");
     try {
       const quests = await loadQuests();
       const openQuests = quests.filter(q => q.status !== "closed");
       document.getElementById("statOpen").textContent = openQuests.length;
 
       if (openQuests.length === 0) {
-        list.innerHTML = `<div class="empty-state">Пока нет открытых квестов. Загляните позже — партнёры уже готовят задания 🌱</div>`;
-        return;
-      }
-
-      list.innerHTML = openQuests.map(q => `
-        <div class="ticket">
-          <div class="ticket-icon">🎯</div>
-          <div>
-            <div class="ticket-tag">${(q.category || "ЗАДАНИЕ").toUpperCase()} · от ${q.ownerName || "организации"}</div>
-            <div class="ticket-title">${q.title}</div>
-            <div class="ticket-reward">+ купон · ${q.reward || "уточняется"}</div>
+        questList.innerHTML = `<div class="empty-state">Пока нет открытых квестов. Загляните позже — партнёры уже готовят задания 🌱</div>`;
+      } else {
+        questList.innerHTML = openQuests.map(q => `
+          <div class="ticket">
+            <div class="ticket-icon">🎯</div>
+            <div>
+              <div class="ticket-tag">${(q.category || "ЗАДАНИЕ").toUpperCase()} · от ${q.ownerName || "организации"}</div>
+              <div class="ticket-title">${q.title}</div>
+              <div class="ticket-reward">+ купон · ${q.reward || "уточняется"}</div>
+            </div>
           </div>
-        </div>
-      `).join("");
+        `).join("");
+      }
     } catch (e) {
-      list.innerHTML = `<div class="empty-state">Не удалось загрузить квесты. Проверьте настройки Firebase.</div>`;
+      questList.innerHTML = `<div class="empty-state">Не удалось загрузить квесты.</div>`;
+      console.error(e);
+    }
+
+    // 2. Загрузка товаров и купонов в Магазин
+    const shopList = document.getElementById("shopList");
+    try {
+      const coupons = await loadCoupons();
+      if (coupons.length === 0) {
+        shopList.innerHTML = `<div class="empty-state">В магазине пока нет доступных товаров. Партнёры скоро добавят новые награды! 🛍</div>`;
+      } else {
+        shopList.innerHTML = coupons.map(c => `
+          <div class="ticket">
+            <div class="ticket-icon">🎁</div>
+            <div>
+              <div class="ticket-tag">${(c.category || "АКЦИЯ").toUpperCase()} · от ${c.ownerName || "партнёра"}</div>
+              <div class="ticket-title">${c.title}</div>
+              <div class="ticket-reward">Стоимость: ${c.cost} XP</div>
+            </div>
+          </div>
+        `).join("");
+      }
+    } catch (e) {
+      shopList.innerHTML = `<div class="empty-state">Не удалось загрузить товары магазина.</div>`;
       console.error(e);
     }
   });

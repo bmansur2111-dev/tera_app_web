@@ -51,9 +51,9 @@
   <aside class="app-sidebar">
     <a href="../index.html" class="logo">Ter<span>a</span></a>
     <nav class="app-nav">
-      <a class="nav-link active" data-tab="quests">🎯 Мои квесты</a>
-      <a class="nav-link" data-tab="shop">🛍 Магазин наград</a>
-      <a class="nav-link" data-tab="profile">👤 Профиль</a>
+      <a class="nav-link" id="nav-quests" data-tab="quests" style="display:none;">🎯 Мои квесты</a>
+      <a class="nav-link" id="nav-shop" data-tab="shop" style="display:none;">🛍 Магазин наград</a>
+      <a class="nav-link" id="nav-profile" data-tab="profile">👤 Профиль</a>
       <a href="#" id="logoutBtn" style="margin-top: auto; color: #ff8585;">🚪 Выйти</a>
     </nav>
   </aside>
@@ -61,7 +61,7 @@
   <main class="app-main">
 
     <!-- ВКЛАДКА 1: КВЕСТЫ -->
-    <section id="tab-quests" class="tab-content active">
+    <section id="tab-quests" class="tab-content">
       <div class="app-topbar">
         <h2 id="partnerTitle">Управление заданиями</h2>
       </div>
@@ -94,13 +94,13 @@
             <label>Максимальное количество волонтёров</label>
             <div style="display:flex; gap:12px; align-items:center;">
               <input type="number" id="questMaxVolunteers" placeholder="Например: 15" min="1">
-              <p style="font-size: 13px; color: #666; background: #fff8e1; border-left: 3px solid #ffc107; padding: 8px 12px; margin-top: 8px; border-radius: 4px;">
-                💡 <b>Информация для организатора:</b> Если вы используете стороннюю ссылку (Google Формы и т.д.), не забудьте настроить ограничение ответов в настройках самой формы. На платформе это значение отображается волонтёрам как справочная информация.
-              </p>
               <label class="checkbox-inline">
                 <input type="checkbox" id="questUnlimited"> Без ограничений
               </label>
             </div>
+            <p style="font-size: 13px; color: #666; background: #fff8e1; border-left: 3px solid #ffc107; padding: 8px 12px; margin-top: 8px; border-radius: 4px;">
+              💡 <b>Информация для организатора:</b> Если вы используете стороннюю ссылку (Google Формы и т.д.), не забудьте настроить ограничение ответов в настройках самой формы.
+            </p>
           </div>
           <button type="submit" class="btn-submit">Опубликовать квест</button>
         </form>
@@ -209,18 +209,32 @@
   });
 
   // Переключение вкладок
-  const navLinks = document.querySelectorAll('.app-nav .nav-link');
-  const tabContents = document.querySelectorAll('.tab-content');
-  navLinks.forEach(link => {
+  function switchTab(targetTab) {
+    const navLinks = document.querySelectorAll('.app-nav .nav-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    navLinks.forEach(l => {
+      if (l.getAttribute('data-tab') === targetTab) {
+        l.classList.add('active');
+      } else {
+        l.classList.remove('active');
+      }
+    });
+
+    tabContents.forEach(c => {
+      if (c.id === `tab-${targetTab}`) {
+        c.classList.add('active');
+      } else {
+        c.classList.remove('active');
+      }
+    });
+  }
+
+  document.querySelectorAll('.app-nav .nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetTab = link.getAttribute('data-tab');
-      navLinks.forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-      tabContents.forEach(c => {
-        c.classList.remove('active');
-        if (c.id === `tab-${targetTab}`) c.classList.add('active');
-      });
+      switchTab(targetTab);
     });
   });
 
@@ -228,6 +242,28 @@
   requireAuth("partner", async (profile) => {
     currentPartner = profile;
 
+    // 🔑 Чтение прав из permissions (по вашей структуре Firestore)
+    const perms = profile.permissions || {};
+    const canManageQuests = perms.quests === true;
+    const canManageCoupons = perms.coupons === true;
+
+    const navQuests = document.getElementById("nav-quests");
+    const navShop = document.getElementById("nav-shop");
+
+    // Показываем кнопки только при значении true
+    if (canManageQuests) navQuests.style.display = "block";
+    if (canManageCoupons) navShop.style.display = "block";
+
+    // Авто-переход на доступную вкладку при старте
+    let defaultTab = "profile";
+    if (canManageQuests) {
+      defaultTab = "quests";
+    } else if (canManageCoupons) {
+      defaultTab = "shop";
+    }
+    switchTab(defaultTab);
+
+    // Данные профиля
     document.getElementById("partnerTitle").textContent = profile.name || "Кабинет партнёра";
     document.getElementById("profileName").textContent = profile.name || "Партнёр";
     document.getElementById("profileEmail").textContent = profile.email;
@@ -243,71 +279,75 @@
       avatarEl.textContent = (profile.name || "P").charAt(0);
     }
 
-    refreshContent();
+    refreshContent(canManageQuests, canManageCoupons);
   });
 
-  async function refreshContent() {
+  async function refreshContent(canQuests, canCoupons) {
     // Список квестов
-    try {
-      const quests = await loadQuests(currentPartner.uid);
-      const myQuestList = document.getElementById("myQuestList");
-      if (quests.length === 0) {
-        myQuestList.innerHTML = `<p style="color:#888;">Вы ещё не публиковали квесты.</p>`;
-      } else {
-        myQuestList.innerHTML = quests.map(q => {
-          const limitText = q.maxVolunteers 
-            ? `Ограничение: ${q.maxVolunteers} волонтеров` 
-            : `Без ограничений по местaм`;
-          return `
-            <div class="item-card">
-              <div>
-                <div class="item-title">🎯 ${q.title}</div>
-                <div class="item-sub">Награда: ${q.reward} | ${limitText}</div>
+    if (canQuests) {
+      try {
+        const quests = await loadQuests(currentPartner.uid);
+        const myQuestList = document.getElementById("myQuestList");
+        if (quests.length === 0) {
+          myQuestList.innerHTML = `<p style="color:#888;">Вы ещё не публиковали квесты.</p>`;
+        } else {
+          myQuestList.innerHTML = quests.map(q => {
+            const limitText = q.maxVolunteers 
+              ? `Ограничение: ${q.maxVolunteers} волонтеров` 
+              : `Без ограничений по местaм`;
+            return `
+              <div class="item-card">
+                <div>
+                  <div class="item-title">🎯 ${q.title}</div>
+                  <div class="item-sub">Награда: ${q.reward} | ${limitText}</div>
+                </div>
+                <button class="btn-delete btn-delete-quest" data-id="${q.id}">Удалить</button>
               </div>
-              <button class="btn-delete btn-delete-quest" data-id="${q.id}">Удалить</button>
-            </div>
-          `;
-        }).join("");
+            `;
+          }).join("");
+        }
+      } catch (e) {
+        console.error("Ошибка загрузки квестов:", e);
       }
-    } catch (e) {
-      console.error(e);
     }
 
     // Список купонов
-    try {
-      const coupons = await loadCoupons(currentPartner.uid);
-      const myCouponList = document.getElementById("myCouponList");
-      if (coupons.length === 0) {
-        myCouponList.innerHTML = `<p style="color:#888;">Вы ещё не выставляли купоны.</p>`;
-      } else {
-        myCouponList.innerHTML = coupons.map(c => {
-          const claimed = c.claimedCount || 0;
-          const limitText = c.maxQuantity 
-            ? `Выдано: ${claimed} из ${c.maxQuantity} шт.` 
-            : `Забрали: ${claimed} шт. (Без ограничений)`;
-          return `
-            <div class="item-card">
-              <div>
-                <div class="item-title">🎁 ${c.title} (${c.cost} XP)</div>
-                <div class="item-sub">Код: <b>${c.code}</b> | ${limitText}</div>
+    if (canCoupons) {
+      try {
+        const coupons = await loadCoupons(currentPartner.uid);
+        const myCouponList = document.getElementById("myCouponList");
+        if (coupons.length === 0) {
+          myCouponList.innerHTML = `<p style="color:#888;">Вы ещё не выставляли купоны.</p>`;
+        } else {
+          myCouponList.innerHTML = coupons.map(c => {
+            const claimed = c.claimedCount || 0;
+            const limitText = c.maxQuantity 
+              ? `Выдано: ${claimed} из ${c.maxQuantity} шт.` 
+              : `Забрали: ${claimed} шт. (Без ограничений)`;
+            return `
+              <div class="item-card">
+                <div>
+                  <div class="item-title">🎁 ${c.title} (${c.cost} XP)</div>
+                  <div class="item-sub">Код: <b>${c.code}</b> | ${limitText}</div>
+                </div>
+                <button class="btn-delete btn-delete-coupon" data-id="${c.id}">Удалить</button>
               </div>
-              <button class="btn-delete btn-delete-coupon" data-id="${c.id}">Удалить</button>
-            </div>
-          `;
-        }).join("");
+            `;
+          }).join("");
+        }
+      } catch (e) {
+        console.error("Ошибка загрузки купонов:", e);
       }
-    } catch (e) {
-      console.error(e);
     }
 
-    // Обработчики удаления квестов
+    // Обработчики удаления
     document.querySelectorAll(".btn-delete-quest").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (confirm("Вы уверены, что хотите удалить этот квест?")) {
           try {
             await deleteQuest(btn.getAttribute("data-id"));
             alert("Квест успешно удалён!");
-            refreshContent();
+            refreshContent(canQuests, canCoupons);
           } catch (err) {
             alert("Ошибка при удалении: " + err.message);
           }
@@ -315,14 +355,13 @@
       });
     });
 
-    // Обработчики удаления купонов
     document.querySelectorAll(".btn-delete-coupon").forEach(btn => {
       btn.addEventListener("click", async () => {
         if (confirm("Вы уверены, что хотите удалить этот купон?")) {
           try {
             await deleteCoupon(btn.getAttribute("data-id"));
             alert("Купон успешно удалён!");
-            refreshContent();
+            refreshContent(canQuests, canCoupons);
           } catch (err) {
             alert("Ошибка при удалении: " + err.message);
           }
@@ -349,7 +388,7 @@
       alert("Квест успешно опубликован!");
       document.getElementById("createQuestForm").reset();
       document.getElementById("questMaxVolunteers").disabled = false;
-      refreshContent();
+      refreshContent(true, currentPartner.permissions?.coupons === true);
     } catch (err) {
       alert("Ошибка при создании: " + err.message);
     }
@@ -373,7 +412,7 @@
       alert("Купон успешно опубликован!");
       document.getElementById("createCouponForm").reset();
       document.getElementById("couponMaxQuantity").disabled = false;
-      refreshContent();
+      refreshContent(currentPartner.permissions?.quests === true, true);
     } catch (err) {
       alert("Ошибка при создании: " + err.message);
     }
